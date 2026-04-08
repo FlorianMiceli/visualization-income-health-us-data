@@ -839,11 +839,20 @@ const corrPalette = [
   "#2166ac",
   "#053061"
 ];
+const corrInterp = d3.piecewise(d3.interpolateRgb, corrPalette);
+function corrCellFill(r) {
+  return corrInterp(Math.max(0, Math.min(1, (r + 1) / 2)));
+}
+/** Dark text on light cell fills, white on saturated cells (matches heatmap ramp). */
+function corrTextFill(r) {
+  if (!Number.isFinite(r)) return "var(--theme-foreground)";
+  return d3.lab(corrCellFill(r)).l > 56 ? "#000" : "#fff";
+}
 const corrColor = Plot.scale({
   color: {
     type: "linear",
     domain: [-1, 1],
-    interpolate: d3.piecewise(d3.interpolateRgb, corrPalette),
+    interpolate: corrInterp,
     label: "Pearson r"
   }
 });
@@ -863,7 +872,7 @@ const corrColor = Plot.scale({
           marginBottom: 108,
           x: { domain: labelDomain, label: null, tickRotate: 40 },
           y: { domain: labelDomain, label: null },
-          color: corrColor.color,
+          color: corrColor,
           marks: [
             Plot.cell(heatCells, {
               x: "xi",
@@ -877,8 +886,9 @@ const corrColor = Plot.scale({
               x: "xi",
               y: "xj",
               text: (d) => (Number.isFinite(d.r) ? d.r.toFixed(2) : ""),
-              fill: (d) => (Math.abs(d.r) > 0.55 ? "white" : "var(--theme-foreground)"),
-              fontSize: 7
+              fill: (d) => corrTextFill(d.r),
+              fontSize: 13,
+              fontWeight: 600
             })
           ]
         })
