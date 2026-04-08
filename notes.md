@@ -1,0 +1,5 @@
+- ruralité
+- rapport à la médecine
+- éducation
+- complotisme
+- 
