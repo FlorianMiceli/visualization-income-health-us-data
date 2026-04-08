@@ -75,19 +75,6 @@ export function numericMetricKeys(rows, extraExclude = []) {
   return out.sort((a, b) => a.localeCompare(b));
 }
 
-/** Named ColorBrewer-style schemes (9-step) + matching sequential interpolators. */
-export const COLOR_SCHEME_OPTIONS = [
-  { label: "OrRd (schemeOrRd)", scheme: "OrRd" },
-  { label: "Blues (schemeBlues)", scheme: "Blues" },
-  { label: "Greens (schemeGreens)", scheme: "Greens" },
-  { label: "Reds (schemeReds)", scheme: "Reds" },
-  { label: "Purples (schemePurples)", scheme: "Purples" },
-  { label: "YlOrRd", scheme: "YlOrRd" },
-  { label: "YlGnBu", scheme: "YlGnBu" },
-  { label: "BuPu", scheme: "BuPu" },
-  { label: "Greys", scheme: "Greys" }
-];
-
 export function schemeColorsAndInterpolator(schemeShortName) {
   const cap = schemeShortName.charAt(0).toUpperCase() + schemeShortName.slice(1);
   const schemeKey = `scheme${cap}`;

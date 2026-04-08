@@ -1,6 +1,6 @@
 # US counties — economy & health
 
-[Observable Framework](https://observablehq.com/framework/) app with a single dashboard: **US county-level economy, social context, and cancer indicators** (`/us-county-economy-health`). Data lives under `src/data/kaggle/` (cancer registry + household size + topojson from `us-atlas` via the loader).
+[Observable Framework](https://observablehq.com/framework/) app with a single dashboard: **US county-level economy, social context, and cancer indicators** (`/us-county-economy-health`). Data lives under `src/data/kaggle/` (cancer registry + household size + topojson from `us-atlas` via the loader). Column meanings: [`src/data/kaggle/DATA_DICTIONARY.md`](src/data/kaggle/DATA_DICTIONARY.md).
 
 To install dependencies, run:
 
@@ -28,6 +28,7 @@ For more, see <https://observablehq.com/framework/getting-started>.
 │  │  ├─ kaggle-county-prep.js
 │  │  └─ us-county-choropleth.js
 │  ├─ data/kaggle
+│  │  ├─ DATA_DICTIONARY.md              # column glossary for CSVs
 │  │  ├─ cancer_reg.csv
 │  │  ├─ avg-household-size.csv
 │  │  └─ counties-albers-10m.json.js   # loader → node_modules/us-atlas

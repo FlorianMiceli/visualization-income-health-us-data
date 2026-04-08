@@ -1,0 +1,20 @@
+---
+description: County Kaggle CSV semantics — read DATA_DICTIONARY.md before inferring column meaning
+globs: "{src/data/kaggle/**,src/us-county-economy-health.md,src/components/kaggle-county-prep.js,src/components/us-county-choropleth.js}"
+alwaysApply: false
+---
+
+# Kaggle county data — canonical column meanings
+
+Do **not** guess types, units, or definitions for `src/data/kaggle/*.csv`. Use the project glossary:
+
+**[`src/data/kaggle/DATA_DICTIONARY.md`](src/data/kaggle/DATA_DICTIONARY.md)**
+
+That file is the source of truth for:
+
+- **`avg-household-size.csv`**: FIPS ids, `avghouseholdsize`, `geography`, and the `index` column.
+- **`cancer_reg.csv`**: outcomes (e.g. `target_deathrate` = deaths per 100k), demographics, education, employment, insurance, and extra columns present in the file (race, `incidencerate`, etc.).
+
+**Join:** both files link on **`geography`** (string location name); normalize with trim and collapsed whitespace before matching (see `kaggle-county-prep.js` and the dashboard page). FIPS for maps come from the household file after merge.
+
+If you add metrics, plots, or copy that name CSV columns, align wording and units with `DATA_DICTIONARY.md` and update that file when the dataset or your usage changes.
