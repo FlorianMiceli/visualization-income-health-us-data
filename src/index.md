@@ -1,5 +1,5 @@
 ---
-title: Home
+title: Accueil
 toc: false
 pager: false
 ---

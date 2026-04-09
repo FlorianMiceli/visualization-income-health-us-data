@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>INCA3 visualisation — 1-minute pitch</title>
+  <title>INCA3 — présentation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
@@ -90,6 +90,87 @@
       margin: 0 auto;
     }
 
+    .slide--split {
+      max-width: 72rem;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .slide--split.active {
+      display: grid;
+    }
+
+    .slide__copy {
+      min-width: 0;
+    }
+
+    .slide__visual {
+      margin: 0;
+      min-width: 0;
+      padding: 1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background:
+        radial-gradient(circle at top left, rgba(94, 179, 246, 0.16), transparent 44%),
+        linear-gradient(160deg, rgba(26, 34, 44, 0.96), rgba(15, 20, 25, 0.94));
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .slide__visual svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .visual-caption {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .visual-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 0.9rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(94, 179, 246, 0.14);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .visual-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .visual-stat {
+      padding: 0.75rem 0.85rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .visual-stat strong {
+      display: block;
+      font-size: 1.2rem;
+      color: #ffffff;
+      margin-bottom: 0.15rem;
+    }
+
+    .visual-stat span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
     .slide.active {
       display: flex;
     }
@@ -163,6 +244,10 @@
         color: #111;
       }
 
+      .slide--split {
+        display: grid !important;
+      }
+
       .slide:last-of-type {
         page-break-after: auto;
         break-after: auto;
@@ -185,6 +270,12 @@
         color: #111 !important;
       }
 
+      .slide__visual {
+        background: #f4f4f4;
+        border-color: #ddd;
+        box-shadow: none;
+      }
+
       @page {
         size: A4 landscape;
         margin: 0;
@@ -194,50 +285,54 @@
 </head>
 <body>
   <div class="toolbar no-print">
-    <span class="kbd-hint">← → to move · ~1 min read aloud</span>
-    <button type="button" id="export-pdf" aria-label="Export slides as PDF">Export PDF</button>
+    <span class="kbd-hint">← → pour naviguer</span>
+    <button type="button" id="export-pdf" aria-label="Exporter les slides en PDF">Exporter en PDF</button>
   </div>
 
   <main class="deck" id="deck" aria-live="polite">
     <section class="slide active" data-slide="0" aria-label="Slide 1 of 4">
-      <h1>INCA3 — social inequalities &amp; diet</h1>
-      <h2>What this project is</h2>
-      <p>
-        An interactive dashboard built on the French national nutrition survey (INCA3): weighted patterns of food consumption,
-        nutrient intakes, food groups, and simple composite diet-quality views — broken down by social strata (for example income).
-      </p>
-      <p class="muted">Observable Framework · D3 · survey weights (descriptive, not causal).</p>
+      <div class="visual-tag">Contexte</div>
+      <h1>L’étude INCA3 en bref</h1>
+      <h2>Enquête nationale française sur l’alimentation</h2>
+      <ul>
+        <li><strong>INCA3</strong> mesure ce que les personnes mangent et boivent, avec des données de consommation et de contexte social.</li>
+        <li>Notre projet transforme ces données complexes en <strong>graphiques lisibles</strong> pour comparer les groupes sociaux.</li>
+        <li>Lecture <strong>descriptive et pondérée</strong> : on décrit les écarts.</li>
+      </ul>
+      <p class="muted">Observable Framework · D3 · données INCA3.</p>
     </section>
 
     <section class="slide" data-slide="1" aria-label="Slide 2 of 4">
-      <h1>Who it is for</h1>
-      <h2>Audience</h2>
+      <h1>Notre question</h1>
+      <h2>Que veut-on vérifier visuellement ?</h2>
       <ul>
-        <li><strong>Public health &amp; policy</strong> — quick, evidence-aligned views of inequality in what people eat.</li>
-        <li><strong>Researchers &amp; students</strong> — reproducible charts instead of only raw tables.</li>
-        <li><strong>Anyone</strong> exploring how diet-related indicators differ across groups in a national sample.</li>
+        <li><strong>Question centrale</strong> : observe-t-on un gradient social d’alimentation selon le revenu ?</li>
+        <li>On compare les quartiles de revenu sur l’indice « santé », l’insécurité alimentaire, la structure du panier et les apports.</li>
+        <li>Message attendu : rendre visible <strong>où</strong> se creusent les écarts, et <strong>sur quels indicateurs</strong>.</li>
       </ul>
+      <p class="muted">Notre objectif est d’identifier et de comparer ces écarts de manière claire.</p>
     </section>
 
     <section class="slide" data-slide="2" aria-label="Slide 3 of 4">
-      <h1>Why it matters</h1>
-      <h2>Interest &amp; importance</h2>
-      <p>
-        Diet is a lever for population health, and social gradients in food access and quality are a core equity issue.
-        Official microdata are rich but heavy to navigate; this project makes key contrasts visible, comparable, and tied to
-        transparent visualization choices.
-      </p>
-      <p class="muted">It supports informed discussion — not replacement of causal studies or official reporting.</p>
+      <div class="visual-tag">Importance</div>
+      <h1>Pourquoi c’est important ?</h1>
+      <h2>Un enjeu de santé publique et d’équité</h2>
+      <ul>
+        <li>Les écarts observés ne sont pas anecdotiques : ils sont <strong>réguliers le long de l’échelle sociale</strong>.</li>
+        <li>Ils touchent à la fois la qualité nutritionnelle, la sécurité alimentaire et les déterminants sociaux de santé.</li>
+        <li>L’ensemble des visualisations aide à <strong>prioriser la discussion</strong> et à orienter les actions de prévention.</li>
+      </ul>
+      <p class="muted">C’est un outil d’aide à la lecture des inégalités.</p>
     </section>
 
     <section class="slide" data-slide="3" aria-label="Slide 4 of 4">
-      <h1>Explore the dashboard</h1>
-      <h2>Next step</h2>
+      <h1>Synthèse</h1>
+      <h2>INCA3 et notre question, en une phrase</h2>
       <p>
-        Run the app locally (<code style="background:var(--surface);padding:0.15em 0.4em;border-radius:4px;font-size:0.9em;">npm run dev</code>)
-        and open the page <strong>INCA3 — Social inequalities &amp; diet</strong> (<code style="background:var(--surface);padding:0.15em 0.4em;border-radius:4px;font-size:0.9em;">/inca-inequality</code>).
+        À partir d’INCA3, nous posons une question simple : <strong>comment l’alimentation varie-t-elle selon le revenu ?</strong>
+        Notre visualisation montre ces écarts de façon claire, utile pour la santé publique, la recherche et la communication.
       </p>
-      <p class="muted">Thank you.</p>
+      <p class="muted">Merci.</p>
     </section>
   </main>
 

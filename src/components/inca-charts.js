@@ -14,15 +14,15 @@ export const IA_COLORS = {
 
 export const LABELS = {
   IA_statut: {
-    0: "Food secure",
-    1: "Food insecurity (moderate)",
-    2: "Food insecurity (severe)"
+    0: "Sécurité alimentaire",
+    1: "Insécurité alimentaire (modérée)",
+    2: "Insécurité alimentaire (sévère)"
   },
   RUC_4cl: {
-    1: "Lowest household income / UC",
-    2: "Low–mid",
-    3: "Mid–high",
-    4: "Highest household income / UC"
+    1: "Classe pauvre",
+    2: "Classe moyenne modeste",
+    3: "Classe moyenne aisée",
+    4: "Classe riche"
   },
   /** Libellés indicatifs — codes 1–4 : PCS personne de référence (4 classes, notice INCA3). */
   PCS_4cl_PR: {
@@ -32,26 +32,31 @@ export const LABELS = {
     4: "Employés et ouvriers"
   },
   situ_alim_statut: {
-    1: "Food sufficiency: always enough",
-    2: "Sometimes not enough",
-    3: "Often not enough"
+    1: "Suffisance alimentaire : toujours suffisante",
+    2: "Parfois insuffisante",
+    3: "Souvent insuffisante"
   }
 };
 
 /** Short column headers for heatmaps (full labels in tooltips). */
 export const HEATMAP_SHORT_LABELS = {
-  conso_gpe21: "Vegetables",
-  conso_gpe24: "Fruit",
+  conso_gpe21: "Légumes",
+  conso_gpe24: "Fruits",
   conso_gpe17: "Charcuterie",
   conso_gpe40: "Pizza / sandwich",
-  conso_gpe31: "Sweet drinks",
-  conso_gpe6: "Cakes / biscuits",
-  nutriment8: "Fiber",
-  nutriment31: "Salt"
+  conso_gpe31: "Boissons sucrées",
+  conso_gpe6: "Gâteaux / biscuits",
+  nutriment8: "Fibres",
+  nutriment31: "Sel"
 };
 
 function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
+}
+
+function shortIncomeClassLabel(stratum, labels = LABELS.RUC_4cl) {
+  const full = labels?.[Number(stratum)] ?? `Classe ${stratum}`;
+  return full.replace(/^Classe\s+/i, "");
 }
 
 /** WCAG-style relative luminance for sRGB. */
@@ -151,7 +156,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Food security composition by household income quartile. Each bar is one hundred percent of weighted Pop2 respondents in that quartile. Compare colored segment proportions: blue food secure, orange moderate insecurity, red severe. Descriptive weighted survey data, not causal."
+      "Composition de la sécurité alimentaire par classe sociale. Chaque barre représente cent pour cent des répondants Pop2 pondérés de la classe. Comparer les proportions des segments colorés : bleu sécurité alimentaire, orange insécurité modérée, rouge insécurité sévère. Données descriptives pondérées, non causales."
     );
 
   const innerW = width - margin.left - margin.right;
@@ -208,7 +213,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     })
     .each(function (d) {
       const label = valueLabels[d.key] ?? d.key;
-      const title = `${stratumLabels[d.stratum] ?? d.stratum}\n${label}: ${d.pct.toFixed(1)}% (weighted Pop2)`;
+      const title = `${stratumLabels[d.stratum] ?? d.stratum}\n${label}: ${d.pct.toFixed(1)}% (pondéré Pop2)`;
       d3.select(this).append("title").text(title);
     });
 
@@ -229,7 +234,10 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     .attr("pointer-events", "none")
     .text((d) => `${d.pct.toFixed(0)}%`);
 
-  const xAxis = g.append("g").attr("transform", `translate(0,${innerH})`).call(d3.axisBottom(x).tickFormat((d) => `Q${d}`));
+  const xAxis = g
+    .append("g")
+    .attr("transform", `translate(0,${innerH})`)
+    .call(d3.axisBottom(x).tickFormat((d) => shortIncomeClassLabel(d, stratumLabels)));
   xAxis.selectAll("text").attr("fill", "currentColor").attr("font-size", "12px");
   xAxis.selectAll("line, path").attr("stroke", "currentColor").attr("stroke-opacity", 0.35);
 
@@ -249,7 +257,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     .attr("fill", "currentColor")
     .attr("font-size", "12px")
     .attr("font-weight", "600")
-    .text("Share of each food-security status (weighted %)");
+    .text("Part de chaque statut de sécurité alimentaire (%, pondéré)");
   if (subtitle) {
     titleG
       .append("text")
@@ -270,7 +278,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     .attr("text-anchor", "middle")
     .attr("fill", "currentColor")
     .attr("font-size", "11px")
-    .text("Percent of stratum");
+    .text("Pourcentage de la strate");
 
   const colorScale = d3
     .scaleOrdinal()
@@ -345,7 +353,7 @@ export function chartStackedMacroComposition(container, dist, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Barres empilées à cent pour cent par quartile de revenu : cinq grandes familles alimentaires, hors eaux et boissons (conso_gpe29–34). Comparer les proportions entre Q1 et Q4. Pop3 pondéré."
+      "Barres empilées à cent pour cent par classe sociale : cinq grandes familles alimentaires, hors eaux et boissons (conso_gpe29–34). Comparer les proportions entre classe pauvre et classe riche. Pop3 pondéré."
     );
 
   const x = d3.scaleBand().domain(strata.map(String)).range([0, innerW]).padding(0.22);
@@ -498,18 +506,18 @@ export function chartBehaviorsGrouped(container, series, opts) {
   const metrics = [
     {
       key: "fastFoodFrequent",
-      line1: "Frequent fast food",
-      line2: "Scale step ≥ 6"
+      line1: "Restauration rapide fréquente",
+      line2: "Échelon d’échelle ≥ 6"
     },
     {
       key: "organicAny",
-      line1: "Any organic consumption",
+      line1: "Consommation de bio (au moins une)",
       line2: null
     },
     {
       key: "cantineFrequentChildren",
-      line1: "Frequent school canteen",
-      line2: "Children only · step ≥ 6"
+      line1: "Cantine scolaire fréquente",
+      line2: "Enfants uniquement · échelon ≥ 6"
     }
   ];
 
@@ -546,7 +554,7 @@ export function chartBehaviorsGrouped(container, series, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Weighted share of three eating patterns by household income quartile (darker blue = higher income quartile). Rows: frequent fast food (scale six or more), any organic consumption, frequent school canteen for children only. Each bar includes only respondents with a valid answer on that item. Percent scale on horizontal axis."
+      "Part pondérée de trois comportements alimentaires par classe sociale (bleu plus foncé = classe plus aisée). Lignes : restauration rapide fréquente (échelle six ou plus), consommation de bio (au moins une), cantine scolaire fréquente pour les enfants uniquement. Chaque barre inclut seulement les répondants ayant une réponse valide pour l’item. Échelle en pourcentage sur l’axe horizontal."
     );
 
   const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
@@ -609,14 +617,14 @@ export function chartBehaviorsGrouped(container, series, opts) {
         const v = d[m.key];
         const metricNote =
           m.key === "cantineFrequentChildren"
-            ? " Children only: adults excluded; share among children with valid canteen frequency (scale ≥ 6 = frequent)."
+            ? " Enfants uniquement : adultes exclus ; part parmi les enfants avec fréquence de cantine valide (échelle ≥ 6 = fréquent)."
             : m.key === "fastFoodFrequent"
-              ? " Among respondents with valid fast-food frequency; frequent = scale step ≥ 6."
-              : " Among respondents with valid organic item; any organic consumption.";
+              ? " Parmi les répondants avec fréquence de restauration rapide valide ; fréquent = échelon d’échelle ≥ 6."
+              : " Parmi les répondants avec item bio valide ; au moins une consommation de bio.";
         const t =
           v == null
-            ? `No valid responses for this row.${metricNote}`
-            : `${(v * 100).toFixed(1)}% weighted (income quartile ${d.stratum}, Pop2).${metricNote}`;
+            ? `Aucune réponse valide pour cette ligne.${metricNote}`
+            : `${(v * 100).toFixed(1)}% pondéré (${LABELS.RUC_4cl[d.stratum] ?? `Classe ${d.stratum}`}, Pop2).${metricNote}`;
         d3.select(this).append("title").text(t);
       });
 
@@ -685,7 +693,7 @@ export function chartBehaviorsGrouped(container, series, opts) {
 
   const leg = Swatches(rucColor, {
     columns: width >= 480 ? 4 : 2,
-    format: (s) => `Income Q${s}`,
+    format: (s) => LABELS.RUC_4cl[Number(s)] ?? `Classe ${s}`,
     swatchWidth: 12,
     swatchHeight: 12
   });
@@ -704,8 +712,8 @@ export function chartBehaviorsGrouped(container, series, opts) {
  */
 export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = {}) {
   const width = opts.width ?? 720;
-  const rowLabel = opts.rowLabel ?? ((s) => `Income Q${s}`);
-  const chartTitle = opts.title ?? "Mean intake by stratum";
+  const rowLabel = opts.rowLabel ?? ((s) => LABELS.RUC_4cl[Number(s)] ?? `Classe ${s}`);
+  const chartTitle = opts.title ?? "Apport moyen par strate";
   const chartFootnote = opts.footnote !== undefined ? opts.footnote : null;
 
   const rowLabels = rows.map((r) => rowLabel(r.stratum));
@@ -752,7 +760,7 @@ export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = 
     .attr("role", "img")
     .attr(
       "aria-label",
-      `${chartTitle}. Rows are income strata; columns are food groups and nutrients. Cell values are stratum mean grams per day; second line is percent difference from national Pop3 weighted mean. Hover cells for exact figures. Descriptive data, not causal.`
+      `${chartTitle}. Les lignes correspondent aux strates de revenu ; les colonnes aux groupes alimentaires et nutriments. Les valeurs des cellules sont les grammes par jour moyens de la strate ; la deuxième ligne montre l’écart en pourcentage à la moyenne nationale Pop3 pondérée. Survoler les cellules pour les valeurs exactes. Données descriptives, non causales.`
     );
 
   svg
@@ -844,9 +852,9 @@ export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = 
     .each(function (d) {
       const lines = [
         `${rowLabel(d.stratum)} · ${d.fullLabel}`,
-        d.v == null ? "n/a" : `Stratum mean: ${d.v.toFixed(1)} g/day`,
-        d.nat == null ? "" : `National Pop3 mean: ${d.nat.toFixed(1)} g/day`,
-        d.rel == null ? "" : `Vs national: ${d.rel >= 0 ? "+" : ""}${(d.rel * 100).toFixed(1)}%`
+        d.v == null ? "n/d" : `Moyenne de strate : ${d.v.toFixed(1)} g/j`,
+        d.nat == null ? "" : `Moyenne nationale Pop3 : ${d.nat.toFixed(1)} g/j`,
+        d.rel == null ? "" : `Écart à la moyenne nationale : ${d.rel >= 0 ? "+" : ""}${(d.rel * 100).toFixed(1)}%`
       ];
       d3.select(this).append("title").text(lines.filter(Boolean).join("\n"));
     });
@@ -930,7 +938,7 @@ export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = 
     .attr("font-size", "10px")
     .attr("fill", "currentColor")
     .attr("opacity", 0.9)
-    .text(`Below national ← 0% → Above national (±${(maxAbs * 100).toFixed(0)}% scale)`);
+    .text(`Sous la moyenne nationale ← 0% → Au-dessus de la moyenne (échelle ±${(maxAbs * 100).toFixed(0)}%)`);
 
   container.append(wrap);
 }
@@ -939,7 +947,7 @@ export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = 
  * Line chart: mean health score vs income stratum (RUC 1–4), continuous x for a clear trend.
  * @param {HTMLElement} container
  * @param {Array<{ stratum: number, meanHealthScore: number|null }>} series
- * @param {{ width: number, stratumLabels?: Record<number|string, string>, subtitle?: string|null, footnote?: string|null, showNationalRef?: boolean }} opts
+ * @param {{ width: number, stratumLabels?: Record<number|string, string>, subtitle?: string|null, footnote?: string|null, showNationalRef?: boolean, selectedStratum?: number|null, onSelectStratum?: ((stratum:number)=>void)|null }} opts
  */
 export function chartHealthScoreIncomeLine(container, series, opts) {
   const width = opts.width ?? 640;
@@ -947,20 +955,25 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
   const subtitle = opts.subtitle !== undefined ? opts.subtitle : null;
   const footnote = opts.footnote ?? null;
   const showNationalRef = opts.showNationalRef !== false;
+  const selectedStratum = Number.isFinite(opts.selectedStratum) ? Number(opts.selectedStratum) : null;
+  const onSelectStratum = typeof opts.onSelectStratum === "function" ? opts.onSelectStratum : null;
 
   const points = series
     .filter((d) => d.meanHealthScore != null && Number.isFinite(d.meanHealthScore))
-    .map((d) => ({ stratum: d.stratum, y: d.meanHealthScore }))
+    .map((d) => ({
+      stratum: d.stratum,
+      yScore: d.meanHealthScore,
+      yDelta: d.meanHealthScore - 50
+    }))
     .sort((a, b) => a.stratum - b.stratum);
 
-  const vals = points.map((d) => d.y);
-  // Tight y-domain around data so the trend reads steeper (still honest tick values).
-  const yMargin = 2;
-  const yMin = Math.max(0, (d3.min(vals) ?? 45) - yMargin);
-  const yMax = Math.min(100, (d3.max(vals) ?? 55) + yMargin);
-  const yPad = Math.max(yMax - yMin, 4);
-  const y0 = Math.max(0, yMin - yPad * 0.015);
-  const y1 = Math.min(100, yMax + yPad * 0.015);
+  const vals = points.map((d) => d.yDelta);
+  const yMargin = 1;
+  const yMin = (d3.min(vals) ?? -2) - yMargin;
+  const yMax = (d3.max(vals) ?? 2) + yMargin;
+  const yPad = Math.max(yMax - yMin, 2);
+  const y0 = yMin - yPad * 0.015;
+  const y1 = yMax + yPad * 0.015;
 
   const margin = { top: subtitle ? 54 : 38, right: 22, bottom: 36, left: 50 };
   const height = 300;
@@ -1006,37 +1019,37 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .attr("stroke-opacity", 0.08)
     .attr("pointer-events", "none");
 
-  if (showNationalRef && y(50) >= 0 && y(50) <= innerH) {
+  if (showNationalRef && y(0) >= 0 && y(0) <= innerH) {
     g.append("line")
       .attr("x1", 0)
       .attr("x2", innerW)
-      .attr("y1", y(50))
-      .attr("y2", y(50))
+      .attr("y1", y(0))
+      .attr("y2", y(0))
       .attr("stroke", "currentColor")
       .attr("stroke-opacity", 0.22)
       .attr("stroke-dasharray", "5,4")
       .attr("pointer-events", "none");
     g.append("text")
       .attr("x", innerW - 4)
-      .attr("y", y(50) - 4)
+      .attr("y", y(0) - 4)
       .attr("text-anchor", "end")
       .attr("font-size", "9px")
       .attr("fill", "currentColor")
       .attr("opacity", 0.65)
-      .text("Moyenne nat. ≈ 50");
+      .text("Moyenne nat. = 0 pp");
   }
 
   if (points.length >= 2) {
     const lineGen = d3
       .line()
       .x((d) => x(d.stratum))
-      .y((d) => y(d.y))
+      .y((d) => y(d.yDelta))
       .curve(d3.curveMonotoneX);
     const areaGen = d3
       .area()
       .x((d) => x(d.stratum))
-      .y0(innerH)
-      .y1((d) => y(d.y))
+      .y0(y(0))
+      .y1((d) => y(d.yDelta))
       .curve(d3.curveMonotoneX);
 
     g.append("path")
@@ -1061,17 +1074,24 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .join("circle")
     .attr("class", "pt")
     .attr("cx", (d) => x(d.stratum))
-    .attr("cy", (d) => y(d.y))
-    .attr("r", 6)
+    .attr("cy", (d) => y(d.yDelta))
+    .attr("r", (d) => (selectedStratum != null && d.stratum === selectedStratum ? 8 : 6))
     .attr("fill", (d) => rucPt(String(d.stratum)))
     .attr("stroke", "var(--theme-background, #fff)")
-    .attr("stroke-width", 2)
-    .style("cursor", "default")
+    .attr("stroke-width", (d) => (selectedStratum != null && d.stratum === selectedStratum ? 3 : 2))
+    .style("cursor", onSelectStratum ? "pointer" : "default")
+    .on("click", function (event, d) {
+      if (!onSelectStratum) return;
+      event.preventDefault();
+      onSelectStratum(d.stratum);
+    })
     .each(function (d) {
       const lab = stratumLabels[d.stratum] ?? `Strate ${d.stratum}`;
       d3.select(this)
         .append("title")
-        .text(`${lab}\nIndice : ${d.y.toFixed(1)} / 100`);
+        .text(
+          `${lab}\nEcart vs moyenne: ${d.yDelta >= 0 ? "+" : ""}${d.yDelta.toFixed(1)} pp\nIndice: ${d.yScore.toFixed(1)} / 100`
+        );
     });
 
   g.selectAll("text.val")
@@ -1079,12 +1099,12 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .join("text")
     .attr("class", "val")
     .attr("x", (d) => x(d.stratum))
-    .attr("y", (d) => y(d.y) - 12)
+    .attr("y", (d) => y(d.yDelta) - 12)
     .attr("text-anchor", "middle")
     .attr("font-size", "11px")
     .attr("font-weight", "700")
     .attr("fill", "currentColor")
-    .text((d) => d.y.toFixed(1));
+    .text((d) => `${d.yDelta >= 0 ? "+" : ""}${d.yDelta.toFixed(1)}`);
 
   const xAxis = g
     .append("g")
@@ -1093,14 +1113,23 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
       d3
         .axisBottom(x)
         .ticks(4)
-        .tickFormat((d) => `Q${d}`)
+        .tickFormat((d) => shortIncomeClassLabel(d, stratumLabels))
         .tickValues([1, 2, 3, 4])
     );
   xAxis.selectAll("text").attr("fill", "currentColor").attr("font-size", "12px");
+  if (selectedStratum != null) {
+    xAxis
+      .selectAll(".tick text")
+      .attr("font-weight", (d) => (Number(d) === selectedStratum ? "700" : "400"));
+  }
   xAxis.selectAll("line, path").attr("stroke", "currentColor").attr("stroke-opacity", 0.35);
 
   const yAxis = g.append("g").call(
-    d3.axisLeft(y).ticks(6).tickSizeOuter(0).tickFormat((t) => `${t}`)
+    d3
+      .axisLeft(y)
+      .ticks(6)
+      .tickSizeOuter(0)
+      .tickFormat((t) => `${Number(t) >= 0 ? "+" : ""}${Number(t).toFixed(1)}`)
   );
   yAxis.selectAll("text").attr("fill", "currentColor").attr("font-size", "11px");
   yAxis.selectAll(".tick line").attr("stroke", "currentColor").attr("stroke-opacity", 0.35);
@@ -1113,7 +1142,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .attr("text-anchor", "middle")
     .attr("fill", "currentColor")
     .attr("font-size", "11px")
-    .text("Indice (0–100)");
+    .text("Ecart a la moyenne (points de pourcentage)");
 
   const titleG = g.append("g").attr("class", "inca-chart-title");
   titleG
@@ -1124,7 +1153,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .attr("fill", "currentColor")
     .attr("font-size", "13px")
     .attr("font-weight", "600")
-    .text("Indice « santé » en fonction du revenu (courbe)");
+    .text("Indice « sante » : ecart a la moyenne par classe sociale");
   if (subtitle) {
     titleG
       .append("text")
@@ -1140,7 +1169,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
 
   const leg = Swatches(rucPt, {
     columns: width >= 480 ? 4 : 2,
-    format: (s) => stratumLabels[Number(s)] ?? `Q${s}`,
+    format: (s) => stratumLabels[Number(s)] ?? `Classe ${s}`,
     swatchWidth: 12,
     swatchHeight: 12
   });
@@ -1153,6 +1182,846 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     wrap.append(fg);
     for (const ln of lines) fg.append(html`<div>${ln}</div>`);
   }
+
+  container.append(wrap);
+}
+
+/**
+ * Profil de contribution moyenne des composantes de l'indice pour une strate donnée.
+ * @param {HTMLElement} container
+ * @param {Array<{label: string, role: string, meanContribution: number|null, meanContributionScore?: number|null}>} components
+ * @param {{ width: number, title?: string, subtitle?: string|null }} opts
+ */
+export function chartHealthScoreContributionProfile(container, components, opts = {}) {
+  const width = opts.width ?? 640;
+  const title = opts.title ?? "Décomposition de l'indice (contributions moyennes)";
+  const subtitle = opts.subtitle !== undefined ? opts.subtitle : null;
+
+  const valueOf = (d) =>
+    d.meanContributionScore != null && Number.isFinite(d.meanContributionScore)
+      ? d.meanContributionScore
+      : d.meanContribution;
+
+  const rows = components.filter((d) => valueOf(d) != null && Number.isFinite(valueOf(d)));
+  const ordered = [
+    ...rows.filter((d) => d.role === "protective"),
+    ...rows.filter((d) => d.role === "risk"),
+    ...rows.filter((d) => d.role === "context")
+  ];
+
+  const maxAbs = Math.max(0.1, d3.max(ordered, (d) => Math.abs(valueOf(d))) ?? 0.8);
+  const margin = { top: subtitle ? 56 : 40, right: 26, bottom: 34, left: 260 };
+  const rowH = 24;
+  const height = Math.max(280, margin.top + ordered.length * rowH + margin.bottom + 12);
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+
+  clear(container);
+  const wrap = html`<div
+    class="inca-chart-wrap"
+    style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;color:var(--theme-foreground,inherit);"
+  ></div>`;
+
+  const svg = d3
+    .select(wrap)
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("width", width)
+    .attr("height", height)
+    .attr("role", "img")
+    .attr("aria-label", "Contributions moyennes par composante de l'indice santé, pour la strate sélectionnée.");
+
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+  const x = d3.scaleLinear().domain([-maxAbs * 1.1, maxAbs * 1.1]).range([0, innerW]);
+  const y = d3
+    .scaleBand()
+    .domain(ordered.map((d) => d.label))
+    .range([0, innerH])
+    .padding(0.24);
+
+  g.append("line")
+    .attr("x1", x(0))
+    .attr("x2", x(0))
+    .attr("y1", 0)
+    .attr("y2", innerH)
+    .attr("stroke", "currentColor")
+    .attr("stroke-opacity", 0.35)
+    .attr("stroke-dasharray", "3,3");
+
+  g.selectAll("rect.cbar")
+    .data(ordered)
+    .join("rect")
+    .attr("class", "cbar")
+    .attr("x", (d) => Math.min(x(0), x(valueOf(d))))
+    .attr("y", (d) => y(d.label))
+    .attr("width", (d) => Math.max(1, Math.abs(x(valueOf(d)) - x(0))))
+    .attr("height", y.bandwidth())
+    .attr("rx", 2)
+    .attr("fill", (d) => {
+      if (valueOf(d) >= 0) return d.role === "context" ? "#8250df" : "#1a7f37";
+      return "#cf222e";
+    })
+    .attr("opacity", 0.9)
+    .each(function (d) {
+      d3.select(this)
+        .append("title")
+        .text(`${d.label}\nContribution moyenne: ${valueOf(d).toFixed(2)} point(s) d'indice`);
+    });
+
+  g.selectAll("text.yLab")
+    .data(ordered)
+    .join("text")
+    .attr("class", "yLab")
+    .attr("x", -10)
+    .attr("y", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("text-anchor", "end")
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "11px")
+    .attr("fill", "currentColor")
+    .text((d) => d.label);
+
+  g.selectAll("text.cval")
+    .data(ordered)
+    .join("text")
+    .attr("class", "cval")
+    .attr("x", (d) => (valueOf(d) >= 0 ? x(valueOf(d)) + 5 : x(valueOf(d)) - 5))
+    .attr("y", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("text-anchor", (d) => (valueOf(d) >= 0 ? "start" : "end"))
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "10px")
+    .attr("font-weight", "600")
+    .attr("fill", "currentColor")
+    .text((d) => `${valueOf(d).toFixed(1)} pt`);
+
+  const xAxis = g.append("g").attr("transform", `translate(0,${innerH})`).call(
+    d3.axisBottom(x).ticks(5)
+  );
+  xAxis.selectAll("text").attr("fill", "currentColor").attr("font-size", "10px");
+  xAxis.selectAll("line, path").attr("stroke", "currentColor").attr("stroke-opacity", 0.35);
+
+  svg
+    .append("text")
+    .attr("x", margin.left + innerW / 2)
+    .attr("y", height - 6)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "10px")
+    .attr("font-weight", "500")
+    .attr("fill", "currentColor")
+    .attr("opacity", 0.88)
+    .text("Contribution moyenne (points d'indice)");
+
+  svg
+    .append("text")
+    .attr("x", margin.left + innerW / 2)
+    .attr("y", 18)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "13px")
+    .attr("font-weight", "600")
+    .attr("fill", "currentColor")
+    .text(title);
+
+  if (subtitle) {
+    svg
+      .append("text")
+      .attr("x", margin.left + innerW / 2)
+      .attr("y", 34)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "10px")
+      .attr("font-weight", "500")
+      .attr("fill", "currentColor")
+      .attr("opacity", 0.88)
+      .text(subtitle);
+  }
+
+  container.append(wrap);
+}
+
+/**
+ * Comparaison "classe pauvre" vs "classe riche" des contributions par composante.
+ * Echelle adaptee pour rendre les ecarts lisibles (zoom auto autour de 0).
+ * @param {HTMLElement} container
+ * @param {Array<{stratum:number, components:Array<{id?:string,label:string,meanContribution:number|null,meanContributionScore?:number|null}>}>} byStratum
+ * @param {{ width:number, stratumA?:number, stratumB?:number, stratumLabels?:Record<number|string,string>, title?:string, subtitle?:string|null, maxItems?:number }} opts
+ */
+export function chartHealthContributionDumbbell(container, byStratum, opts = {}) {
+  const width = opts.width ?? 560;
+  const stratumA = Number.isFinite(opts.stratumA) ? Number(opts.stratumA) : 1;
+  const stratumB = Number.isFinite(opts.stratumB) ? Number(opts.stratumB) : 4;
+  const stratumLabels = opts.stratumLabels ?? LABELS.RUC_4cl;
+  const title = opts.title ?? "Leviers de l'ecart nutritionnel";
+  const subtitle =
+    opts.subtitle !== undefined
+      ? opts.subtitle
+      : `${stratumLabels[stratumA] ?? `Classe ${stratumA}`} vs ${stratumLabels[stratumB] ?? `Classe ${stratumB}`}`;
+  const maxItems = Number.isFinite(opts.maxItems) ? Number(opts.maxItems) : 9;
+
+  const valueOf = (d) =>
+    d.meanContributionScore != null && Number.isFinite(d.meanContributionScore)
+      ? d.meanContributionScore
+      : d.meanContribution;
+
+  const a = byStratum.find((d) => d.stratum === stratumA);
+  const b = byStratum.find((d) => d.stratum === stratumB);
+  const bById = new Map((b?.components ?? []).map((c) => [c.id ?? c.label, c]));
+
+  const rows = [];
+  for (const cA of a?.components ?? []) {
+    const cB = bById.get(cA.id ?? cA.label);
+    if (!cB) continue;
+    const vA = valueOf(cA);
+    const vB = valueOf(cB);
+    if (!Number.isFinite(vA) || !Number.isFinite(vB)) continue;
+    rows.push({
+      id: cA.id ?? cA.label,
+      label: cA.label,
+      a: vA,
+      b: vB,
+      delta: vB - vA
+    });
+  }
+
+  const top = rows.sort((u, v) => Math.abs(v.delta) - Math.abs(u.delta)).slice(0, maxItems);
+
+  const maxAbsObserved = d3.max(top, (d) => Math.max(Math.abs(d.a), Math.abs(d.b), Math.abs(d.delta))) ?? 0.2;
+  const maxAbs = Math.max(0.25, Math.min(2.5, maxAbsObserved * 1.18));
+
+  const margin = { top: subtitle ? 56 : 40, right: 56, bottom: 30, left: 210 };
+  const rowH = 26;
+  const height = Math.max(300, margin.top + top.length * rowH + margin.bottom + 6);
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+
+  clear(container);
+  const wrap = html`<div class="inca-chart-wrap" style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;color:var(--theme-foreground,inherit);"></div>`;
+  const svg = d3
+    .select(wrap)
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("width", width)
+    .attr("height", height)
+    .attr("role", "img")
+    .attr("aria-label", "Comparaison des contributions par composante entre classe pauvre et classe riche.");
+
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+  const x = d3.scaleLinear().domain([-maxAbs, maxAbs]).range([0, innerW]);
+  const y = d3
+    .scaleBand()
+    .domain(top.map((d) => d.label))
+    .range([0, innerH])
+    .padding(0.28);
+
+  g.append("line")
+    .attr("x1", x(0))
+    .attr("x2", x(0))
+    .attr("y1", 0)
+    .attr("y2", innerH)
+    .attr("stroke", "currentColor")
+    .attr("stroke-opacity", 0.28)
+    .attr("stroke-dasharray", "4,3");
+
+  g.selectAll("line.dl")
+    .data(top)
+    .join("line")
+    .attr("class", "dl")
+    .attr("x1", (d) => x(d.a))
+    .attr("x2", (d) => x(d.b))
+    .attr("y1", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("y2", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("stroke", "currentColor")
+    .attr("stroke-opacity", 0.36)
+    .attr("stroke-width", 2);
+
+  const colorPoor = "#d73027";
+  const colorRich = "#4575b4";
+
+  g.selectAll("circle.pa")
+    .data(top)
+    .join("circle")
+    .attr("class", "pa")
+    .attr("cx", (d) => x(d.a))
+    .attr("cy", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("r", 4.2)
+    .attr("fill", colorPoor)
+    .each(function (d) {
+      d3.select(this)
+        .append("title")
+        .text(`${stratumLabels[stratumA] ?? `Classe ${stratumA}`}\n${d.label}: ${d.a.toFixed(2)} pp`);
+    });
+
+  g.selectAll("circle.pb")
+    .data(top)
+    .join("circle")
+    .attr("class", "pb")
+    .attr("cx", (d) => x(d.b))
+    .attr("cy", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("r", 4.2)
+    .attr("fill", colorRich)
+    .each(function (d) {
+      d3.select(this)
+        .append("title")
+        .text(`${stratumLabels[stratumB] ?? `Classe ${stratumB}`}\n${d.label}: ${d.b.toFixed(2)} pp`);
+    });
+
+  g.selectAll("text.yl")
+    .data(top)
+    .join("text")
+    .attr("class", "yl")
+    .attr("x", -8)
+    .attr("y", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("text-anchor", "end")
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "11px")
+    .attr("fill", "currentColor")
+    .text((d) => d.label);
+
+  g.selectAll("text.dd")
+    .data(top)
+    .join("text")
+    .attr("class", "dd")
+    .attr("x", innerW + 4)
+    .attr("y", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("text-anchor", "start")
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "10px")
+    .attr("font-weight", "600")
+    .attr("fill", "currentColor")
+    .text((d) => `D ${d.delta >= 0 ? "+" : ""}${d.delta.toFixed(2)} pp`);
+
+  const xAxis = g.append("g").attr("transform", `translate(0,${innerH})`).call(
+    d3.axisBottom(x).ticks(5).tickFormat((t) => `${Number(t) >= 0 ? "+" : ""}${Number(t).toFixed(2)}`)
+  );
+  xAxis.selectAll("text").attr("fill", "currentColor").attr("font-size", "10px");
+  xAxis.selectAll("line, path").attr("stroke", "currentColor").attr("stroke-opacity", 0.35);
+
+  svg
+    .append("text")
+    .attr("x", margin.left + innerW / 2)
+    .attr("y", 18)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "13px")
+    .attr("font-weight", "600")
+    .attr("fill", "currentColor")
+    .text(title);
+
+  if (subtitle) {
+    svg
+      .append("text")
+      .attr("x", margin.left + innerW / 2)
+      .attr("y", 34)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "10px")
+      .attr("font-weight", "500")
+      .attr("fill", "currentColor")
+      .attr("opacity", 0.88)
+      .text(subtitle);
+  }
+
+  svg
+    .append("text")
+    .attr("x", margin.left + innerW / 2)
+    .attr("y", height - 6)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "10px")
+    .attr("font-weight", "500")
+    .attr("fill", "currentColor")
+    .attr("opacity", 0.9)
+    .text("Contributions en points de pourcentage (echelle auto-zoomee)");
+
+  const lg = svg.append("g").attr("transform", `translate(${margin.left},${height - 6})`);
+  lg.append("circle").attr("cx", -2).attr("cy", -22).attr("r", 4).attr("fill", colorPoor);
+  lg
+    .append("text")
+    .attr("x", 8)
+    .attr("y", -22)
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "10px")
+    .attr("fill", "currentColor")
+    .text(stratumLabels[stratumA] ?? `Classe ${stratumA}`);
+  lg.append("circle").attr("cx", 180).attr("cy", -22).attr("r", 4).attr("fill", colorRich);
+  lg
+    .append("text")
+    .attr("x", 190)
+    .attr("y", -22)
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "10px")
+    .attr("fill", "currentColor")
+    .text(stratumLabels[stratumB] ?? `Classe ${stratumB}`);
+
+  container.append(wrap);
+}
+
+/**
+ * Heatmap "classes sociales × indicateurs" with mixed units.
+ * Colors encode within-indicator z-scores; cell labels show oriented gap values.
+ * @param {HTMLElement} container
+ * @param {Array<{stratum:number, metrics: Record<string, number|null>}>} rows
+ * @param {Array<{id:string, label:string, shortLabel?:string, format?:(v:number)=>string}>} indicators
+ * @param {{ width:number, stratumLabels?:Record<number|string,string>, title?:string, subtitle?:string|null, legendLabel?:string }} opts
+ */
+export function chartInequalityIndicatorHeatmap(container, rows, indicators, opts = {}) {
+  const width = opts.width ?? 640;
+  const stratumLabels = opts.stratumLabels ?? LABELS.RUC_4cl;
+  const title = opts.title ?? "Carte des inegalites nutritionnelles";
+  const subtitle =
+    opts.subtitle !== undefined
+      ? opts.subtitle
+      : "Couleur: ecart standardise au sein de chaque indicateur";
+  const legendLabel =
+    opts.legendLabel ?? "Moins favorable  -  0  -  Plus favorable";
+
+  const rowLabel = (s) => stratumLabels[Number(s)] ?? `Classe ${s}`;
+  const rowLabels = rows.map((r) => rowLabel(r.stratum));
+  const leftW = Math.min(190, Math.max(100, 16 + (d3.max(rowLabels, (s) => s.length) ?? 12) * 7));
+
+  const cellW = Math.max(86, (width - leftW - 26) / Math.max(1, indicators.length));
+  const cellH = 44;
+  const headerH = 46;
+  const topPad = subtitle ? 44 : 30;
+  const legendH = 48;
+  const height = topPad + headerH + rows.length * cellH + legendH + 22;
+
+  const zByIndicator = new Map();
+  for (const ind of indicators) {
+    const vals = rows
+      .map((r) => r.metrics?.[ind.id])
+      .filter((v) => Number.isFinite(v));
+    const mean = vals.length ? d3.mean(vals) : 0;
+    const sd = vals.length > 1 ? d3.deviation(vals) : 0;
+    const denom = sd && sd > 1e-9 ? sd : 1;
+    zByIndicator.set(ind.id, { mean, denom });
+  }
+
+  const cells = [];
+  for (let i = 0; i < rows.length; i++) {
+    for (let j = 0; j < indicators.length; j++) {
+      const ind = indicators[j];
+      const raw = rows[i].metrics?.[ind.id];
+      const zInfo = zByIndicator.get(ind.id);
+      const z = Number.isFinite(raw) ? (raw - zInfo.mean) / zInfo.denom : null;
+      cells.push({
+        i,
+        j,
+        stratum: rows[i].stratum,
+        indicator: ind,
+        raw,
+        z: z == null ? null : Math.max(-2.6, Math.min(2.6, z))
+      });
+    }
+  }
+
+  const color = d3.scaleDiverging(d3.interpolateRdBu).domain([-2.2, 0, 2.2]);
+
+  clear(container);
+  const wrap = html`<div class="inca-chart-wrap" style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;color:var(--theme-foreground,inherit);"></div>`;
+  const svg = d3
+    .select(wrap)
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("width", width)
+    .attr("height", height)
+    .attr("role", "img")
+    .attr(
+      "aria-label",
+      "Heatmap des inegalites nutritionnelles par classe sociale et indicateur. Les couleurs montrent un ecart standardise au sein de chaque indicateur."
+    );
+
+  svg
+    .append("text")
+    .attr("x", leftW + (indicators.length * cellW) / 2)
+    .attr("y", 16)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "13px")
+    .attr("font-weight", "600")
+    .attr("fill", "currentColor")
+    .text(title);
+
+  if (subtitle) {
+    svg
+      .append("text")
+      .attr("x", leftW + (indicators.length * cellW) / 2)
+      .attr("y", 32)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "10px")
+      .attr("font-weight", "500")
+      .attr("opacity", 0.88)
+      .attr("fill", "currentColor")
+      .text(subtitle);
+  }
+
+  const g = svg.append("g").attr("transform", `translate(${leftW},${topPad})`);
+
+  g.selectAll("g.colHead")
+    .data(indicators)
+    .join("g")
+    .attr("class", "colHead")
+    .attr("transform", (d, i) => `translate(${i * cellW + cellW / 2},${headerH - 28})`)
+    .each(function (d) {
+      const lines = splitTitleForColumn(d.shortLabel ?? d.label, cellW);
+      const gg = d3.select(this);
+      lines.forEach((ln, li) => {
+        gg.append("text")
+          .attr("x", 0)
+          .attr("y", li * 12)
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "hanging")
+          .attr("font-size", "9px")
+          .attr("font-weight", "600")
+          .attr("fill", "currentColor")
+          .text(ln);
+      });
+    });
+
+  g.selectAll("rect.hm")
+    .data(cells)
+    .join("rect")
+    .attr("class", "hm")
+    .attr("x", (d) => d.j * cellW + 1)
+    .attr("y", (d) => headerH + d.i * cellH)
+    .attr("width", cellW - 3)
+    .attr("height", cellH - 3)
+    .attr("rx", 3)
+    .attr("fill", (d) => (d.z == null ? "rgba(120,120,130,0.14)" : color(d.z)))
+    .attr("stroke", "currentColor")
+    .attr("stroke-opacity", 0.14)
+    .style("cursor", "pointer")
+    .on("mouseenter", function () {
+      d3.select(this).attr("stroke-opacity", 0.5).attr("stroke-width", 2);
+    })
+    .on("mouseleave", function () {
+      d3.select(this).attr("stroke-opacity", 0.14).attr("stroke-width", 1);
+    })
+    .each(function (d) {
+      const display = Number.isFinite(d.raw)
+        ? (d.indicator.format ? d.indicator.format(d.raw) : `${d.raw.toFixed(1)}`)
+        : "n/d";
+      d3.select(this)
+        .append("title")
+        .text(`${rowLabel(d.stratum)} · ${d.indicator.label}\nEcart: ${display}${d.z == null ? "" : `\nZ-score: ${d.z.toFixed(2)}`}`);
+    });
+
+  g.selectAll("g.hmt")
+    .data(cells.filter((d) => Number.isFinite(d.raw)))
+    .join("g")
+    .attr("class", "hmt")
+    .attr("transform", (d) => `translate(${d.j * cellW + cellW / 2},${headerH + d.i * cellH + cellH / 2})`)
+    .each(function (d) {
+      const fill = d.z == null ? "currentColor" : textColorForFill(color, d.z);
+      const stroke = d.z == null ? "none" : cellTextStroke(color(d.z));
+      const text = d.indicator.format ? d.indicator.format(d.raw) : `${d.raw.toFixed(1)}`;
+      d3.select(this)
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("font-size", "10px")
+        .attr("font-weight", "700")
+        .attr("fill", fill)
+        .attr("stroke", stroke)
+        .attr("stroke-width", d.z == null ? 0 : 0.42)
+        .attr("paint-order", "stroke fill")
+        .attr("stroke-linejoin", "round")
+        .text(text);
+    });
+
+  svg
+    .selectAll("text.rlab")
+    .data(rows)
+    .join("text")
+    .attr("class", "rlab")
+    .attr("x", leftW - 10)
+    .attr("y", (d, i) => topPad + headerH + i * cellH + cellH / 2)
+    .attr("text-anchor", "end")
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "12px")
+    .attr("font-weight", "500")
+    .attr("fill", "currentColor")
+    .text((d) => rowLabel(d.stratum));
+
+  const legendW = Math.min(250, width - leftW - 26);
+  const lx = leftW + (indicators.length * cellW - legendW) / 2;
+  const ly = topPad + headerH + rows.length * cellH + 14;
+  const defs = svg.append("defs");
+  const gradId = `ineq-hm-${Math.random().toString(16).slice(2)}`;
+  const lg = defs.append("linearGradient").attr("id", gradId).attr("x1", "0%").attr("x2", "100%");
+  for (const t of d3.range(0, 1.01, 0.08)) {
+    const v = -2.2 + t * 4.4;
+    lg.append("stop").attr("offset", `${t * 100}%`).attr("stop-color", color(v));
+  }
+
+  svg
+    .append("rect")
+    .attr("x", lx)
+    .attr("y", ly)
+    .attr("width", legendW)
+    .attr("height", 10)
+    .attr("rx", 2)
+    .attr("fill", `url(#${gradId})`)
+    .attr("stroke", "currentColor")
+    .attr("stroke-opacity", 0.2);
+
+  svg
+    .append("text")
+    .attr("x", lx + legendW / 2)
+    .attr("y", ly + 24)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "10px")
+    .attr("fill", "currentColor")
+    .attr("opacity", 0.9)
+    .text(legendLabel);
+
+  container.append(wrap);
+}
+
+/**
+ * Vertical inequality story: one block per indicator, classes ordered top->bottom.
+ * Each block shows a centered local scale and the trajectory from poor to rich.
+ * @param {HTMLElement} container
+ * @param {Array<{stratum:number, metrics: Record<string, number|null>}>} rows
+ * @param {Array<{id:string, label:string, shortLabel?:string, format?:(v:number)=>string}>} indicators
+ * @param {{ width:number, stratumLabels?:Record<number|string,string>, title?:string, subtitle?:string|null }} opts
+ */
+export function chartInequalityVerticalLadder(container, rows, indicators, opts = {}) {
+  const width = opts.width ?? 640;
+  const stratumLabels = opts.stratumLabels ?? LABELS.RUC_4cl;
+  const title = opts.title ?? "Profils socio-economiques des indicateurs alimentaires";
+  const subtitle =
+    opts.subtitle !== undefined
+      ? opts.subtitle
+      : "Comparaison des classes sociales sur des indicateurs harmonises";
+
+  const classOrder = [1, 2, 3, 4];
+  const classColors = {
+    1: "#d73027",
+    2: "#fdae61",
+    3: "#74add1",
+    4: "#4575b4"
+  };
+
+  const blocks = indicators.map((ind) => {
+    const pts = classOrder
+      .map((s) => {
+        const row = rows.find((r) => Number(r.stratum) === s);
+        const v = row?.metrics?.[ind.id];
+        return Number.isFinite(v) ? { stratum: s, value: v } : null;
+      })
+      .filter(Boolean);
+
+    const maxAbs = Math.max(2.5, d3.max(pts, (d) => Math.abs(d.value)) ?? 2.5);
+    return { ind, pts, maxAbs: maxAbs * 1.15 };
+  });
+
+  const margin = { top: subtitle ? 58 : 42, right: 24, bottom: 22, left: 24 };
+  const blockH = 118;
+  const blockGap = 14;
+  const blockInnerTop = 22;
+  const blockInnerBottom = 14;
+  const usableH = blockH - blockInnerTop - blockInnerBottom;
+  const contentH = blocks.length * blockH + Math.max(0, blocks.length - 1) * blockGap;
+  const height = margin.top + contentH + margin.bottom;
+  const innerW = width - margin.left - margin.right;
+  const labelColW = Math.max(116, Math.min(150, innerW * 0.23));
+  const plotLeft = labelColW;
+  const plotRight = innerW - 46;
+
+  clear(container);
+  const wrap = html`<div class="inca-chart-wrap" style="font-family:system-ui,-apple-system,sans-serif;font-size:13px;color:var(--theme-foreground,inherit);"></div>`;
+  const svg = d3
+    .select(wrap)
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("width", width)
+    .attr("height", height)
+    .attr("role", "img")
+    .attr(
+      "aria-label",
+      "Comparaison des profils socio-economiques sur des indicateurs alimentaires et de vulnerabilite."
+    );
+
+  svg
+    .append("text")
+    .attr("x", margin.left + innerW / 2)
+    .attr("y", 18)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "13px")
+    .attr("font-weight", "600")
+    .attr("fill", "currentColor")
+    .text(title);
+
+  if (subtitle) {
+    svg
+      .append("text")
+      .attr("x", margin.left + innerW / 2)
+      .attr("y", 34)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "10px")
+      .attr("font-weight", "500")
+      .attr("opacity", 0.88)
+      .attr("fill", "currentColor")
+      .text(subtitle);
+  }
+
+  const root = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  blocks.forEach((b, i) => {
+    const y0 = i * (blockH + blockGap);
+    const g = root.append("g").attr("transform", `translate(0,${y0})`);
+
+    g.append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", innerW)
+      .attr("height", blockH)
+      .attr("rx", 8)
+      .attr("fill", "rgba(120,120,130,0.06)")
+      .attr("stroke", "currentColor")
+      .attr("stroke-opacity", 0.12);
+
+    g.append("text")
+      .attr("x", innerW / 2)
+      .attr("y", 14)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "11px")
+      .attr("font-weight", "700")
+      .attr("fill", "currentColor")
+      .text(splitTitleForColumn(b.ind.shortLabel ?? b.ind.label, Math.max(160, innerW * 0.55))[0]);
+
+    const secondLine = splitTitleForColumn(b.ind.shortLabel ?? b.ind.label, Math.max(160, innerW * 0.55))[1];
+    if (secondLine) {
+      g.append("text")
+        .attr("x", innerW / 2)
+        .attr("y", 26)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "10px")
+        .attr("font-weight", "600")
+        .attr("fill", "currentColor")
+        .attr("opacity", 0.9)
+        .text(secondLine);
+    }
+
+    const x = d3.scaleLinear().domain([-b.maxAbs, b.maxAbs]).range([plotLeft, plotRight]);
+    const y = d3
+      .scalePoint()
+      .domain(classOrder.map(String))
+      .range([blockInnerTop + 14, blockInnerTop + usableH - 6]);
+
+    g.append("line")
+      .attr("x1", plotLeft)
+      .attr("x2", plotRight)
+      .attr("y1", blockInnerTop + 6)
+      .attr("y2", blockInnerTop + 6)
+      .attr("stroke", "currentColor")
+      .attr("stroke-opacity", 0.09);
+
+    g.append("text")
+      .attr("x", plotLeft)
+      .attr("y", blockInnerTop + 2)
+      .attr("text-anchor", "start")
+      .attr("font-size", "9px")
+      .attr("fill", "currentColor")
+      .attr("opacity", 0.72)
+      .text(`${(-b.maxAbs).toFixed(1)}`);
+
+    g.append("text")
+      .attr("x", x(0))
+      .attr("y", blockInnerTop + 2)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "9px")
+      .attr("fill", "currentColor")
+      .attr("opacity", 0.72)
+      .text("0");
+
+    g.append("text")
+      .attr("x", plotRight)
+      .attr("y", blockInnerTop + 2)
+      .attr("text-anchor", "end")
+      .attr("font-size", "9px")
+      .attr("fill", "currentColor")
+      .attr("opacity", 0.72)
+      .text(`${b.maxAbs.toFixed(1)}`);
+
+    g.append("line")
+      .attr("x1", x(0))
+      .attr("x2", x(0))
+      .attr("y1", blockInnerTop + 6)
+      .attr("y2", blockInnerTop + usableH + 2)
+      .attr("stroke", "currentColor")
+      .attr("stroke-opacity", 0.22)
+      .attr("stroke-dasharray", "4,4");
+
+    const line = d3
+      .line()
+      .x((d) => x(d.value))
+      .y((d) => y(String(d.stratum)))
+      .curve(d3.curveMonotoneY);
+
+    g.append("path")
+      .datum(b.pts)
+      .attr("fill", "none")
+      .attr("stroke", "#7f8a99")
+      .attr("stroke-opacity", 0.65)
+      .attr("stroke-width", 2)
+      .attr("d", line);
+
+    g.selectAll("circle.pt")
+      .data(b.pts)
+      .join("circle")
+      .attr("class", "pt")
+      .attr("cx", (d) => x(d.value))
+      .attr("cy", (d) => y(String(d.stratum)))
+      .attr("r", 4.2)
+      .attr("fill", (d) => classColors[d.stratum] ?? "#6e7781")
+      .attr("stroke", "var(--theme-background, #fff)")
+      .attr("stroke-width", 1.5)
+      .each(function (d) {
+        const txt = b.ind.format ? b.ind.format(d.value) : `${d.value.toFixed(1)}`;
+        d3.select(this)
+          .append("title")
+          .text(`${stratumLabels[d.stratum] ?? `Classe ${d.stratum}`}\n${b.ind.label}: ${txt}`);
+      });
+
+    g.selectAll("text.classLab")
+      .data(classOrder)
+      .join("text")
+      .attr("class", "classLab")
+      .attr("x", 10)
+      .attr("y", (d) => y(String(d)))
+      .attr("dominant-baseline", "middle")
+      .attr("font-size", "10px")
+      .attr("font-weight", "600")
+      .attr("fill", (d) => classColors[d] ?? "currentColor")
+      .text((d) => shortIncomeClassLabel(d, stratumLabels));
+
+    g.selectAll("text.v")
+      .data(b.pts)
+      .join("text")
+      .attr("class", "v")
+      .attr("x", (d) => x(d.value) + (d.value >= 0 ? 7 : -7))
+      .attr("y", (d) => y(String(d.stratum)))
+      .attr("dominant-baseline", "middle")
+      .attr("text-anchor", (d) => (d.value >= 0 ? "start" : "end"))
+        .attr("font-size", "9.5px")
+      .attr("font-weight", "700")
+      .attr("fill", "currentColor")
+        .attr("stroke", "var(--theme-background, #fff)")
+        .attr("stroke-width", 2.4)
+        .attr("paint-order", "stroke fill")
+        .attr("stroke-linejoin", "round")
+      .text((d) => (b.ind.format ? b.ind.format(d.value) : `${d.value.toFixed(1)}`));
+  });
+
+      const legendX0 = margin.left + Math.max(8, (innerW - 4 * 125) / 2);
+      const legend = svg.append("g").attr("transform", `translate(${legendX0},${height - 8})`);
+  classOrder.forEach((s, i) => {
+    const x0 = i * 128;
+    legend.append("circle").attr("cx", x0).attr("cy", -12).attr("r", 4).attr("fill", classColors[s]);
+    legend
+      .append("text")
+      .attr("x", x0 + 8)
+      .attr("y", -12)
+      .attr("dominant-baseline", "middle")
+      .attr("font-size", "10px")
+      .attr("fill", "currentColor")
+      .text(stratumLabels[s] ?? `Classe ${s}`);
+  });
 
   container.append(wrap);
 }

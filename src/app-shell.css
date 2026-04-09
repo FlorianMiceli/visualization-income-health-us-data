@@ -178,6 +178,8 @@ label#observablehq-sidebar-close {
 /* INCA dashboard */
 .inca-dashboard {
   font-family: var(--serif);
+  max-width: 1260px;
+  margin: 0 auto;
   padding-bottom: 2rem;
 }
 
@@ -198,7 +200,7 @@ label#observablehq-sidebar-close {
   color: var(--theme-foreground-muted);
   max-width: 72ch;
   line-height: 1.5;
-  margin: 0 0 1.25rem;
+  margin: 0 auto 1.25rem;
 }
 
 .inca-hero {
@@ -217,6 +219,21 @@ label#observablehq-sidebar-close {
   padding: 1rem 1.15rem 1.15rem;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+.inca-hero > .inca-hero__panel:only-child {
+  grid-column: 1 / -1;
+}
+
+.inca-hero:has(> .inca-hero__panel:only-child) {
+  min-height: unset;
+}
+
+.inca-hero > .inca-hero__panel:only-child .inca-chart-wrap,
+.inca-hero > .inca-hero__panel:only-child .observablehq--block {
+  margin-top: 0;
+  flex: 0 0 auto;
   min-height: 0;
 }
 

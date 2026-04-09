@@ -1,71 +1,85 @@
 ---
-title: Visualization rationale (INCA3 dashboard)
+title: Choix de visualisation (tableau INCA3)
 toc: false
 pager: false
 ---
 
 <div class="inca-rationale-page">
 
-# Why these charts, colors, and messages
+# Pourquoi ces visualisations, ces couleurs et ces messages
 
-This page explains the **design choices** behind the [INCA inequality dashboard](./inca-inequality): chart types, palettes, and the story we want readers to take away. It complements the methodological notes on the dashboard itself.
+Cette page présente les **choix de conception** du [tableau INCA3](./inca-inequality) : types de graphiques, palettes et logique de lecture. Elle complète les précisions méthodologiques indiquées sur la page principale.
 
-## Overall idea
+## Idée générale
 
-The dashboard addresses **social inequalities and diet** in INCA3: how **food security**, **reported behaviors** (fast food, organic, canteen), and **measured intakes** (food groups and a few nutrients) **co-vary** with **household living standard** (`RUC_4cl`) and, for robustness, **occupational class** (`PCS_4cl_PR`). Everything is **descriptive and weighted**; we do **not** claim causality.
+Le tableau traite des **inégalités sociales et de l’alimentation** dans INCA3 : comment la **sécurité alimentaire**, certains **comportements déclarés** (restauration rapide, bio, cantine) et les **apports mesurés** (groupes alimentaires et nutriments) varient avec le **niveau de vie du ménage** (`RUC_4cl`) et, en lecture complémentaire, avec la **catégorie socioprofessionnelle** (`PCS_4cl_PR`).
 
----
-
-## Chart 1 — 100% stacked bars (food insecurity × income)
-
-**Why this chart type:**  
-A **100% stacked bar** shows the **composition** of each income class: every bar sums to 100% of the weighted Pop2 population in that class. That makes **inequality in the *distribution* of insecurity** visible at a glance (e.g. more severe insecurity in lower RUC classes), without mixing in differences in **population size** between classes.
-
-**Why these colors:**  
-- **Blue** for *food secure* reads as a stable, “lower concern” state.  
-- **Orange** and **red** for moderate and severe insecurity follow a **natural severity ramp** (ColorBrewer-style) and avoid relying only on green vs red (weak for some color-vision types).  
-The order is **ordinal**: secure → moderate → severe.
-
-**Idea to convey:**  
-**Material living standard** tracks with **food security**: readers should compare the **shape** of stacks across Q1–Q4, not bar heights (which are equal by construction).
+Toutes les analyses sont **descriptives et pondérées** ; il ne s’agit pas d’une démonstration causale.
 
 ---
 
-## Chart 2 — Grouped horizontal bars (behaviors × income)
+## Graphique 1 — Barres empilées à 100 % (insécurité alimentaire × revenu)
 
-**Why this chart type:**  
-**Horizontal bars** share a **common percentage scale** (0–max), so three different behaviors stay **comparable**. Using **one row per behavior** and **four bars per row** (one per income quartile) matches the mental model: “within this behavior, how does the **weighted prevalence** change by income?” **Percent labels** at the end of bars (when space allows) reduce reliance on the axis alone.
+**Pourquoi ce type de graphique :**  
+La barre empilée à 100 % montre la **composition** de chaque classe de revenu : chaque barre représente 100 % de la population Pop2 pondérée de la classe. On visualise ainsi l’**inégalité de distribution** de l’insécurité alimentaire (par exemple plus d’insécurité sévère dans les classes de revenu faibles), sans confondre avec les différences d’effectifs entre classes.
 
-**Why these colors:**  
-A **single sequential blue** ramp from **light (Q1)** to **dark (Q4)** encodes **income rank** consistently everywhere. The same quartile always has the **same hue** across charts, which supports **scanning** and links chart 2 to the income logic in charts 1, 3, and 4.
+**Pourquoi ces couleurs :**  
+- **Bleu** pour la sécurité alimentaire (état de référence).  
+- **Orange** puis **rouge** pour l’insécurité modérée puis sévère (progression cohérente de gravité).  
+L’ordre est **ordinal** : sécurisé → modéré → sévère.
 
-**Layout note:**  
-Metric descriptions sit in an **HTML column** beside each SVG so long labels are **never clipped** inside a narrow SVG margin (a common source of “missing” or obscured text).
-
-**Idea to convey:**  
-Behaviors such as **fast food**, **organic**, and **canteen use** (children only for canteen) **differ by income** in ways that can be read as **patterns**, not as moral judgments.
-
----
-
-## Chart 3 & 4 — Heatmap (mean intake vs national mean)
-
-**Why this chart type:**  
-Readers care about **two things at once**: (1) **absolute** intake (g/day) for interpretation against dietary norms, and (2) **how each stratum differs from the national Pop3 mean** to highlight **inequality**. The heatmap encodes **(2)** in **color** and shows **(1)** as the **large number** in the cell, with **(2)** repeated as a **small % under the mean** so color and text **stay aligned**.
-
-**Why these colors:**  
-**Brown–white–blue-green (BrBG)** is a **diverging** palette centered at **no difference from the national mean**: brown = below, teal/blue-green = above. It is **perceptually balanced** around the reference and works on **dark** themes if text color is chosen from **luminance** of the cell (not a fixed white/black).
-
-**Chart 4:**  
-The same specification with a **control** (RUC vs PCS) supports **robustness**: if patterns are **similar**, the income story is **not solely a quirk of one variable**; if they **differ**, that invites discussion of **composition** (e.g. income vs occupation).
-
-**Idea to convey:**  
-**Dietary quality and processed-food exposure** (vegetables, fruit, sweet drinks, etc.) **vary systematically** with stratification; the national mean is a **reference**, not a target prescription.
+**Message visé :**  
+Le niveau de vie est lié au niveau de sécurité alimentaire ; on compare la **forme des segments** entre classes, pas la hauteur totale des barres (forcément identique).
 
 ---
 
-## References in the project
+## Graphique 2 — Indice « santé » et composition de l’indice
 
-- Variable definitions: [DATA_DICTIONARY](./data/inca/DATA_DICTIONARY)  
-- Live charts: [INCA inequality dashboard](./inca-inequality)
+**Pourquoi ce type de visualisation :**  
+La courbe montre rapidement la position relative de chaque classe sociale sur l’indice global, tandis que la décomposition explique **ce qui contribue** au score de la classe sélectionnée. Cette combinaison “vue d’ensemble + détail” facilite l’interprétation.
+
+**Pourquoi ces couleurs :**  
+Les classes sociales gardent une couleur stable dans l’interface (du plus défavorisé au plus favorisé). Cette cohérence améliore la lecture croisée entre graphiques.
+
+**Point de mise en page :**  
+La composition est placée à côté de la courbe afin d’éviter les allers-retours visuels verticaux et de garder un bloc compact.
+
+**Message visé :**  
+Montrer à la fois l’écart global entre classes et les composantes qui tirent le score vers le haut ou vers le bas.
+
+---
+
+## Graphique 3 — Structure de la consommation par quartile
+
+**Pourquoi ce type de graphique :**  
+Les barres empilées permettent de comparer la **composition relative du panier alimentaire** entre classes de revenu, sur une même échelle visuelle.
+
+**Limite assumée :**  
+Ce format met surtout en évidence la structure relative. Quand les différences sont faibles, le contraste visuel peut paraître limité.
+
+**Message visé :**  
+Comparer les profils de consommation sans sur-interpréter des écarts faibles.
+
+---
+
+## Graphique 4 — Groupes alimentaires et nutriments vs moyenne nationale
+
+**Pourquoi ce type de graphique :**  
+La heatmap permet de lire en même temps :
+- la **valeur moyenne** (ordre de grandeur),
+- et l’**écart à la moyenne nationale** (position relative).
+
+**Pourquoi cette palette :**  
+Une palette divergente centrée sur 0 met en évidence les valeurs au-dessus et au-dessous de la référence nationale.
+
+**Message visé :**  
+Identifier rapidement les dimensions où les classes diffèrent de la moyenne nationale, sans quitter une lecture descriptive.
+
+---
+
+## Références du projet
+
+- Définitions des variables : [Dictionnaire des données](./data/inca/DATA_DICTIONARY)  
+- Tableau principal : [INCA3 — Inégalités sociales et alimentation](./inca-inequality)
 
 </div>

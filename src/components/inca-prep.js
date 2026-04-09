@@ -672,3 +672,76 @@ export function healthScoreMeansByStratum(rows, stratumKey, stratumOrder) {
     };
   });
 }
+
+/**
+ * Décomposition de l'indice santé par composante et par strate (moyenne pondérée des contributions).
+ * Chaque contribution = w_k * s_k * z_k, avec z_k standardisé national et plafonné ±3.
+ * @param {Record<string, unknown>[]} rows lignes Pop3 avec _w, _healthRaw et _healthScore
+ * @param {string} stratumKey clé de strate (ex: RUC_4cl)
+ * @param {number[]} stratumOrder ordre des strates à retourner
+ */
+export function healthScoreContributionMeansByStratum(rows, stratumKey, stratumOrder) {
+  const wf = (r) => /** @type {number} */ (r._w);
+  const statsById = buildHealthScoreStats(rows, wf);
+
+  return stratumOrder.map((s) => {
+    const subset = rows.filter(
+      (r) =>
+        toNum(r[stratumKey]) === s &&
+        Number.isFinite(r._healthScore) &&
+        Number.isFinite(r._healthRaw) &&
+        Number.isFinite(r._w) &&
+        r._w > 0
+    );
+
+    const byId = new Map();
+    for (const item of HEALTH_SCORE_SPEC) {
+      byId.set(item.id, {
+        id: item.id,
+        key: item.column ?? item.id,
+        label: item.label,
+        role: item.role,
+        direction: item.direction,
+        weight: item.weight,
+        num: 0,
+        den: 0
+      });
+    }
+
+    for (const r of subset) {
+      const w = wf(r);
+      for (const item of HEALTH_SCORE_SPEC) {
+        const x = healthComponentNumericValue(r, item);
+        const st = statsById[item.id];
+        if (x == null || !Number.isFinite(x)) continue;
+        if (!st || st.mean == null || st.std == null || st.std <= 0) continue;
+        let z = (x - st.mean) / st.std;
+        if (z < -Z_CLIP) z = -Z_CLIP;
+        if (z > Z_CLIP) z = Z_CLIP;
+        const c = item.weight * item.direction * z;
+        const acc = byId.get(item.id);
+        acc.num += w * c;
+        acc.den += w;
+      }
+    }
+
+    const components = HEALTH_SCORE_SPEC.map((item) => {
+      const acc = byId.get(item.id);
+      const meanContribution = acc.den > 0 ? acc.num / acc.den : null;
+      return {
+        id: item.id,
+        key: item.column ?? item.id,
+        label: item.label,
+        role: item.role,
+        direction: item.direction,
+        weight: item.weight,
+        meanContribution
+      };
+    });
+
+    return {
+      stratum: s,
+      components
+    };
+  });
+}

@@ -1,6 +1,6 @@
 // See https://observablehq.com/framework/config for documentation.
 export default {
-  title: "Data visualisation",
+  title: "Visualisation des données",
   root: "src",
 
   style: "app-shell.css",
@@ -18,7 +18,7 @@ export default {
     const rationale = p.includes("inca-viz-rationale");
     const dict = p.includes("DATA_DICTIONARY");
 
-    return `<a class="inca-header-brand" href="./">INCA · visualisation</a>
+    return `<a class="inca-header-brand" href="./">INCA · visualisations</a>
 <details class="inca-site-nav">
   <summary aria-label="Autres pages"></summary>
   <nav class="inca-site-nav__panel" aria-label="Navigation du site">
@@ -31,7 +31,7 @@ export default {
   },
 
   footer: () =>
-    `<div class="inca-footer-note">Données INCA3 — analyse descriptive pondérée, non causale.</div>`,
+    `<div class="inca-footer-note">Données INCA3 — analyse descriptive</div>`,
 
   pager: false
 };
