@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INCA3 visualisation — 1-minute pitch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a222c;
+      --text: #e8eef4;
+      --muted: #9aa8b6;
+      --accent: #5eb3f6;
+      --accent-dim: #3d7eb0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(15, 20, 25, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+    }
+
+    .toolbar span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .toolbar button {
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--accent-dim);
+      background: var(--accent);
+      color: #0a0e12;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover {
+      filter: brightness(1.08);
+    }
+
+    .toolbar button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .deck {
+      height: 100%;
+      padding-top: 3.25rem;
+    }
+
+    .slide {
+      display: none;
+      height: calc(100vh - 3.25rem);
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem clamp(1.25rem, 5vw, 3.5rem);
+      max-width: 52rem;
+      margin: 0 auto;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    .slide h1 {
+      font-size: clamp(1.75rem, 5vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin: 0 0 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .slide h2 {
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      font-weight: 600;
+      color: var(--accent);
+      margin: 0 0 1.25rem;
+    }
+
+    .slide p, .slide li {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      line-height: 1.55;
+      color: var(--text);
+      margin: 0 0 0.85rem;
+    }
+
+    .slide ul {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+
+    .slide li {
+      margin-bottom: 0.5rem;
+    }
+
+    .slide .muted {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 1.5rem;
+    }
+
+    .kbd-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    @media print {
+      body {
+        overflow: visible;
+        background: #fff;
+        color: #111;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .deck {
+        padding-top: 0;
+        height: auto;
+      }
+
+      .slide {
+        display: flex !important;
+        height: auto;
+        min-height: 0;
+        page-break-after: always;
+        break-after: page;
+        padding: 2cm 1.8cm;
+        max-width: none;
+        color: #111;
+      }
+
+      .slide:last-of-type {
+        page-break-after: auto;
+        break-after: auto;
+      }
+
+      .slide h1, .slide h2, .slide p, .slide li {
+        color: #111;
+      }
+
+      .slide h2 {
+        color: #0d5a8a;
+      }
+
+      .slide .muted, .slide .kbd-hint {
+        color: #444;
+      }
+
+      .slide code {
+        background: #eee !important;
+        color: #111 !important;
+      }
+
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar no-print">
+    <span class="kbd-hint">← → to move · ~1 min read aloud</span>
+    <button type="button" id="export-pdf" aria-label="Export slides as PDF">Export PDF</button>
+  </div>
+
+  <main class="deck" id="deck" aria-live="polite">
+    <section class="slide active" data-slide="0" aria-label="Slide 1 of 4">
+      <h1>INCA3 — social inequalities &amp; diet</h1>
+      <h2>What this project is</h2>
+      <p>
+        An interactive dashboard built on the French national nutrition survey (INCA3): weighted patterns of food consumption,
+        nutrient intakes, food groups, and simple composite diet-quality views — broken down by social strata (for example income).
+      </p>
+      <p class="muted">Observable Framework · D3 · survey weights (descriptive, not causal).</p>
+    </section>
+
+    <section class="slide" data-slide="1" aria-label="Slide 2 of 4">
+      <h1>Who it is for</h1>
+      <h2>Audience</h2>
+      <ul>
+        <li><strong>Public health &amp; policy</strong> — quick, evidence-aligned views of inequality in what people eat.</li>
+        <li><strong>Researchers &amp; students</strong> — reproducible charts instead of only raw tables.</li>
+        <li><strong>Anyone</strong> exploring how diet-related indicators differ across groups in a national sample.</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-slide="2" aria-label="Slide 3 of 4">
+      <h1>Why it matters</h1>
+      <h2>Interest &amp; importance</h2>
+      <p>
+        Diet is a lever for population health, and social gradients in food access and quality are a core equity issue.
+        Official microdata are rich but heavy to navigate; this project makes key contrasts visible, comparable, and tied to
+        transparent visualization choices.
+      </p>
+      <p class="muted">It supports informed discussion — not replacement of causal studies or official reporting.</p>
+    </section>
+
+    <section class="slide" data-slide="3" aria-label="Slide 4 of 4">
+      <h1>Explore the dashboard</h1>
+      <h2>Next step</h2>
+      <p>
+        Run the app locally (<code style="background:var(--surface);padding:0.15em 0.4em;border-radius:4px;font-size:0.9em;">npm run dev</code>)
+        and open the page <strong>INCA3 — Social inequalities &amp; diet</strong> (<code style="background:var(--surface);padding:0.15em 0.4em;border-radius:4px;font-size:0.9em;">/inca-inequality</code>).
+      </p>
+      <p class="muted">Thank you.</p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+      var index = 0;
+
+      function show(i) {
+        index = Math.max(0, Math.min(i, slides.length - 1));
+        slides.forEach(function (el, j) {
+          el.classList.toggle("active", j === index);
+        });
+      }
+
+      document.getElementById("export-pdf").addEventListener("click", function () {
+        window.print();
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+          e.preventDefault();
+          show(index + 1);
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+          e.preventDefault();
+          show(index - 1);
+        } else if (e.key === "Home") {
+          show(0);
+        } else if (e.key === "End") {
+          show(slides.length - 1);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

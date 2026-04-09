@@ -1,0 +1,48 @@
+---
+description: INCA3 (Anses) — contexte méthodologique, tables, pondérations ; ne pas inventer le sens des variables
+globs: "{src/data/inca/**,src/**/*.md}"
+alwaysApply: false
+---
+
+# Données INCA3 dans ce dépôt
+
+## Sources faisant foi
+
+1. **Notice d’utilisation** (même dossier) : `src/data/inca/notice-utilisateurs-donnees-inca3-data.gouvjanv21.pdf` — document **2019-UME-001**, mise à jour janvier 2021.
+2. **Dictionnaire projet** : `src/data/inca/DATA_DICTIONARY.md` — aligné sur cette notice + correspondance avec les fichiers CSV présents.
+
+Pour le **détail des modalités** d’une variable codée (`format_*` dans la notice), utiliser la section **« LISTE DES FORMATS UTILISES DANS LES TABLES INCA3 »** du PDF (à partir d’environ la page 87).
+
+## Ce qu’il faut toujours garder en tête
+
+- **Population cible** : individus en **France métropolitaine (hors Corse)**, ménages ordinaires ; enquête **2014–2015** (5 vagues).
+- **Deux échantillons indépendants** : **Adultes** (18–79 ans) et **Enfants** (0–17 ans). **Ne pas** les analyser comme un seul échantillon ni créer de tranches d’âge qui chevauchent les deux (ex. 15–20 ans interdit).
+- **Niveaux de participation** (variables `pop1`, `pop2`, `pop3` dans `description-indiv.csv`) :
+  - **Pop1 — « ETUDE »** : visite à domicile + questionnaire face-à-face (FAF), etc.
+  - **Pop2 — « AA »** : Pop1 + questionnaires auto-administrés **individuel et ménage** complétés.
+  - **Pop3 — « CONSO »** : Pop2 + **FPQ** + **au moins 2** rappels 24 h (exigence type EFSA).
+- **Pondération et plan de sondage** : utiliser les `pond_*` et variables de plan (`zae`, `strate`, `fpc1`, `fpc2`, `fpc3`, `NOMEN`, `NOIND`) conformément à la notice ; pour une table donnée, respecter la **POPULATION** indiquée dans le PDF et la pondération associée (adultes vs enfants, individu vs ménage, pop1 vs pop2 vs pop3).
+- **Consommations 24 h** : **2 ou 3** jours non consécutifs ; méthode **différente d’INCA2** — **pas** d’interprétation d’évolution temporelle INCA2↔INCA3 au titre des seules données.
+- **Données observées** : apports sur 2–3 jours ; la notice précise les limites pour percentiles / écart-types sans modélisation « usuelle » longue durée.
+- **Table CONSO_COMPO_ALIM** (lignes de consommation détaillées, `qte_conso`, `qte_conso_pond`, `R24_pond`) : décrite dans la notice mais **absente** des CSV open data de ce dépôt ; ne pas supposer qu’elle est disponible ici.
+
+## Fichiers CSV ↔ tables notice
+
+| Table notice (§) | Fichier dans `src/data/inca/` |
+|------------------|-------------------------------|
+| DESCRIPTION_INDIV (3.1) | `description-indiv.csv` |
+| HABITUDES_INDIV (3.2.1) | `habitudes-indiv.csv` |
+| HABITUDES_MEN (3.2.2) | `habitudes-men.csv` |
+| FPQ (3.2.4) | `fpq.csv` |
+| OCCASIONS (3.3.1) | `occasions.csv` |
+| NOMENCLATURE (3.3.2) | `nomenclature-vf-mad-datagouv2021.csv` (jeu publié ; voir `DATA_DICTIONARY.md` pour les colonnes) |
+| CONSO_GPE_INCA3 (3.3.4) | `conso-gpe-inca3.csv` |
+| APPORTS_NUT_ALIM (3.3.5) | `apports-nut-alim.csv` |
+| CONSO_CA_PROD / CONSO_CA_INDIV (3.4) | `conso-ca-prod.csv`, `conso-ca-indiv.csv` |
+
+## Règles pour l’agent
+
+- **Ne pas deviner** le sens d’une variable ni les codes numériques : s’appuyer sur **`DATA_DICTIONARY.md`** + **PDF** (tableaux de variables et liste des `format_*`).
+- **PS** = personne sélectionnée dans le ménage ; **PR** = personne de référence du ménage (définition INSEE, voir notice).
+- Les colonnes des CSV **suivent l’ordre des tableaux** de la notice pour chaque table ; les en-têtes du CSV sont les noms de variables tels que publiés.
+- Citations et mentions obligatoires pour résultats publiés : voir **§2.3** de la notice.

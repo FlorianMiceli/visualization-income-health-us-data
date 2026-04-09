@@ -12,6 +12,7 @@
     "@observablehq/framework": "^1.13.4",
     "d3-dsv": "^3.0.1",
     "htl": "^0.3.1",
+    "katex": "^0.16.11",
     "topojson-client": "^3.1.0",
     "us-atlas": "^3.0.1"
   },

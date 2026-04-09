@@ -1,0 +1,341 @@
+@import url("observablehq:default.css");
+@import url("observablehq:theme-air.css");
+@import url("observablehq:theme-near-midnight.css");
+
+:root {
+  --observablehq-max-width: 1480px;
+  --inca-radius: 12px;
+  --inca-font-ui: "DM Sans", var(--sans-serif);
+}
+
+/* Full-width layout: replace default sidebar with compact header menu */
+#observablehq-sidebar,
+#observablehq-sidebar-toggle,
+#observablehq-sidebar-backdrop,
+label#observablehq-sidebar-close {
+  display: none !important;
+}
+
+#observablehq-center {
+  --observablehq-inset-left: 0rem !important;
+  --observablehq-inset-right: 0rem !important;
+  padding-left: clamp(1rem, 3vw, 2rem) !important;
+  padding-right: clamp(1rem, 3vw, 2rem) !important;
+}
+
+#observablehq-header {
+  font-family: var(--inca-font-ui);
+  border-bottom-color: var(--theme-foreground-fainter);
+  background: color-mix(in srgb, var(--theme-background) 92%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+#observablehq-header .inca-header-brand {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  color: var(--theme-foreground);
+  text-decoration: none;
+}
+
+#observablehq-header .inca-header-brand:hover {
+  color: var(--theme-foreground-focus);
+  text-decoration: none;
+}
+
+/* Discreet site navigation */
+.inca-site-nav {
+  position: relative;
+  margin-left: auto;
+}
+
+.inca-site-nav > summary {
+  list-style: none;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-foreground-muted);
+  border: 1px solid var(--theme-foreground-faintest);
+  background: var(--theme-background-alt);
+  font-size: 0;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.inca-site-nav > summary::-webkit-details-marker {
+  display: none;
+}
+
+.inca-site-nav > summary::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  opacity: 0.75;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='5' cy='12' r='1.5' fill='currentColor' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='currentColor' stroke='none'/%3E%3Ccircle cx='19' cy='12' r='1.5' fill='currentColor' stroke='none'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='5' cy='12' r='1.5' fill='currentColor' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='currentColor' stroke='none'/%3E%3Ccircle cx='19' cy='12' r='1.5' fill='currentColor' stroke='none'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+.inca-site-nav > summary:hover {
+  color: var(--theme-foreground);
+  border-color: var(--theme-foreground-fainter);
+}
+
+.inca-site-nav[open] > summary {
+  color: var(--theme-foreground-focus);
+  border-color: color-mix(in srgb, var(--theme-foreground-focus) 35%, var(--theme-foreground-faintest));
+}
+
+.inca-site-nav__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 220px;
+  padding: 0.4rem;
+  border-radius: 10px;
+  border: 1px solid var(--theme-foreground-fainter);
+  background: var(--theme-background);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--theme-foreground) 12%, transparent);
+  z-index: 20;
+  font: 13px var(--inca-font-ui);
+}
+
+.inca-site-nav__panel a {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  color: var(--theme-foreground-alt);
+  text-decoration: none;
+}
+
+.inca-site-nav__panel a:hover {
+  background: var(--theme-background-alt);
+  color: var(--theme-foreground-focus);
+  text-decoration: none;
+}
+
+.inca-site-nav__panel a[aria-current="page"] {
+  background: color-mix(in srgb, var(--theme-foreground-focus) 12%, var(--theme-background-alt));
+  color: var(--theme-foreground);
+  font-weight: 600;
+}
+
+/* Landing & long-form pages */
+.inca-landing {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.5rem 0 3rem;
+}
+
+.inca-landing h1 {
+  font-family: var(--inca-font-ui);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  letter-spacing: -0.03em;
+}
+
+.inca-landing .inca-landing-lead {
+  font-size: 1.1rem;
+  color: var(--theme-foreground-muted);
+  line-height: 1.55;
+}
+
+.inca-landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.inca-landing-actions a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  font-family: var(--inca-font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--theme-foreground-fainter);
+  background: var(--theme-background-alt);
+  color: var(--theme-foreground);
+}
+
+.inca-landing-actions a:hover {
+  border-color: var(--theme-foreground-focus);
+  color: var(--theme-foreground-focus);
+}
+
+.inca-landing-actions a.inca-landing-actions__primary {
+  background: color-mix(in srgb, var(--theme-foreground-focus) 18%, var(--theme-background-alt));
+  border-color: color-mix(in srgb, var(--theme-foreground-focus) 45%, var(--theme-foreground-fainter));
+}
+
+/* INCA dashboard */
+.inca-dashboard {
+  font-family: var(--serif);
+  padding-bottom: 2rem;
+}
+
+.inca-dashboard h1,
+.inca-dashboard h2,
+.inca-dashboard h3 {
+  font-family: var(--inca-font-ui);
+  letter-spacing: -0.02em;
+}
+
+.inca-dashboard h1 {
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  margin-bottom: 0.35rem;
+}
+
+.inca-dashboard .inca-dash-lead {
+  font-size: 1rem;
+  color: var(--theme-foreground-muted);
+  max-width: 72ch;
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+}
+
+.inca-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+  align-items: stretch;
+  min-height: min(88vh, 920px);
+  margin: 0 0 1.25rem;
+}
+
+.inca-hero__panel {
+  background: var(--theme-background-alt);
+  border: 1px solid var(--theme-foreground-faintest);
+  border-radius: var(--inca-radius);
+  padding: 1rem 1.15rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.inca-hero__panel h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.65rem;
+  color: var(--theme-foreground);
+}
+
+.inca-hero__panel p,
+.inca-hero__panel .inca-health-formula-katex {
+  margin-top: 0;
+}
+
+.inca-hero__panel p {
+  max-width: none;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--theme-foreground-alt);
+}
+
+.inca-hero__panel .inca-chart-wrap,
+.inca-hero__panel .observablehq--block {
+  margin-top: auto;
+  flex: 1;
+  min-height: 200px;
+}
+
+.inca-hero__panel .inca-chart-wrap {
+  width: 100%;
+}
+
+.inca-hero__footnote {
+  font-size: 0.82rem;
+  color: var(--theme-foreground-muted);
+  margin: 0.5rem 0 0;
+  max-width: none;
+}
+
+.inca-rest {
+  margin-top: 0.5rem;
+}
+
+.inca-rest h2 {
+  font-size: 1rem;
+  margin: 1.25rem 0 0.65rem;
+  color: var(--theme-foreground-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.inca-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.inca-card {
+  background: var(--theme-background-alt);
+  border: 1px solid var(--theme-foreground-faintest);
+  border-radius: var(--inca-radius);
+  padding: 1rem 1.1rem;
+  margin: 0;
+}
+
+.inca-card h3 {
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem;
+}
+
+.inca-card p {
+  max-width: none;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--theme-foreground-alt);
+  margin: 0 0 0.5rem;
+}
+
+.inca-card .inca-chart-wrap {
+  width: 100%;
+}
+
+.inca-card--wide {
+  grid-column: 1 / -1;
+}
+
+.inca-dashboard .observablehq--block {
+  max-width: none;
+}
+
+@media (max-width: 960px) {
+  .inca-hero {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+
+  .inca-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inca-footer-note {
+  font: 12px var(--inca-font-ui);
+  color: var(--theme-foreground-faint);
+  text-align: center;
+  padding: 2.5rem 1rem 1.25rem;
+  margin: 0;
+}
+
+.inca-rationale-page {
+  max-width: 820px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+}
+
+.inca-rationale-page h1 {
+  font-family: var(--inca-font-ui);
+  font-size: clamp(1.5rem, 3vw, 1.85rem);
+  letter-spacing: -0.02em;
+}

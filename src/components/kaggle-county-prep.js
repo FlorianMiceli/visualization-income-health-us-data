@@ -104,3 +104,103 @@ export function correlationCells(variables, rows) {
   }
   return cells;
 }
+
+/**
+ * Full Pearson matrix (same minN as {@link pearsonPair}).
+ * @param {{ key: string, label: string }[]} variables
+ * @param {object[]} rows
+ * @returns {number[][]}
+ */
+export function pearsonMatrix(variables, rows, minN = 30) {
+  const n = variables.length;
+  const getters = variables.map((v) => (r) => r[v.key]);
+  const M = Array.from({ length: n }, () => Array(n).fill(NaN));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const r = pearsonPair(rows, getters[i], getters[j], minN);
+      M[i][j] = Number.isFinite(r) ? r : NaN;
+    }
+  }
+  return M;
+}
+
+/** Average dissimilarity between two disjoint index sets using precomputed D. */
+function clusterDistMatrix(A, B, D) {
+  let s = 0;
+  let c = 0;
+  for (const i of A) {
+    for (const j of B) {
+      s += D[i][j];
+      c++;
+    }
+  }
+  return c ? s / c : 0;
+}
+
+function leafOrderFromTree(node) {
+  if (node.leaf) return [node.index];
+  return [...leafOrderFromTree(node.left), ...leafOrderFromTree(node.right)];
+}
+
+/**
+ * Reorder variables so that strong |correlation| runs along the diagonal (blocks),
+ * with the first cluster in the dendrogram at the top-left of the heatmap.
+ * Uses average linkage on distance 1 − |r| (NaN treated as 1).
+ *
+ * @param {{ key: string, label: string }[]} variables
+ * @param {object[]} rows
+ * @returns {{ key: string, label: string }[]}
+ */
+export function orderVariablesByCorrelationClustering(variables, rows, minN = 30) {
+  const n = variables.length;
+  if (n <= 1) return [...variables];
+
+  const M = pearsonMatrix(variables, rows, minN);
+  const D = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => {
+      if (i === j) return 0;
+      const r = M[i][j];
+      return Number.isFinite(r) ? 1 - Math.abs(r) : 1;
+    })
+  );
+
+  /** @type {{ leaf: boolean, index?: number, left?: object, right?: object, members: number[] }[]} */
+  let nodes = variables.map((_, i) => ({
+    leaf: true,
+    index: i,
+    members: [i]
+  }));
+
+  while (nodes.length > 1) {
+    let bi = 0;
+    let bj = 1;
+    let best = Infinity;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const d = clusterDistMatrix(nodes[i].members, nodes[j].members, D);
+        if (d < best - 1e-15 || (Math.abs(d - best) <= 1e-15 && (i < bi || (i === bi && j < bj)))) {
+          best = d;
+          bi = i;
+          bj = j;
+        }
+      }
+    }
+    const a = nodes[bi];
+    const b = nodes[bj];
+    const minA = Math.min(...a.members);
+    const minB = Math.min(...b.members);
+    const left = minA <= minB ? a : b;
+    const right = left === a ? b : a;
+    const merged = {
+      leaf: false,
+      left,
+      right,
+      members: [...left.members, ...right.members]
+    };
+    nodes = nodes.filter((_, k) => k !== bi && k !== bj);
+    nodes.push(merged);
+  }
+
+  const order = leafOrderFromTree(nodes[0]);
+  return order.map((i) => variables[i]);
+}
