@@ -14,40 +14,40 @@ export const IA_COLORS = {
 
 export const LABELS = {
   IA_statut: {
-    0: "Sécurité alimentaire",
-    1: "Insécurité alimentaire (modérée)",
-    2: "Insécurité alimentaire (sévère)"
+    0: "Food security",
+    1: "Food insecurity (moderate)",
+    2: "Food insecurity (severe)"
   },
   RUC_4cl: {
-    1: "Classe pauvre",
-    2: "Classe moyenne modeste",
-    3: "Classe moyenne aisée",
-    4: "Classe riche"
+    1: "Low-income class",
+    2: "Lower-middle class",
+    3: "Upper-middle class",
+    4: "High-income class"
   },
-  /** Libellés indicatifs — codes 1–4 : PCS personne de référence (4 classes, notice INCA3). */
+  /** Reference person PCS — codes 1–4 (INCA3 documentation). */
   PCS_4cl_PR: {
-    1: "Agriculteurs, artisans, commerçants, chefs d’entreprise",
-    2: "Cadres et professions intellectuelles supérieures",
-    3: "Professions intermédiaires",
-    4: "Employés et ouvriers"
+    1: "Farmers, artisans, shopkeepers, business owners",
+    2: "Managers and higher professional occupations",
+    3: "Intermediate occupations",
+    4: "Employees and manual workers"
   },
   situ_alim_statut: {
-    1: "Suffisance alimentaire : toujours suffisante",
-    2: "Parfois insuffisante",
-    3: "Souvent insuffisante"
+    1: "Food sufficiency: always sufficient",
+    2: "Sometimes insufficient",
+    3: "Often insufficient"
   }
 };
 
 /** Short column headers for heatmaps (full labels in tooltips). */
 export const HEATMAP_SHORT_LABELS = {
-  conso_gpe21: "Légumes",
-  conso_gpe24: "Fruits",
+  conso_gpe21: "Vegetables",
+  conso_gpe24: "Fruit",
   conso_gpe17: "Charcuterie",
   conso_gpe40: "Pizza / sandwich",
-  conso_gpe31: "Boissons sucrées",
-  conso_gpe6: "Gâteaux / biscuits",
-  nutriment8: "Fibres",
-  nutriment31: "Sel"
+  conso_gpe31: "Sweet drinks",
+  conso_gpe6: "Cakes / biscuits",
+  nutriment8: "Fibre",
+  nutriment31: "Salt"
 };
 
 function clear(node) {
@@ -55,8 +55,8 @@ function clear(node) {
 }
 
 function shortIncomeClassLabel(stratum, labels = LABELS.RUC_4cl) {
-  const full = labels?.[Number(stratum)] ?? `Classe ${stratum}`;
-  return full.replace(/^Classe\s+/i, "");
+  const full = labels?.[Number(stratum)] ?? `Class ${stratum}`;
+  return full.replace(/^(Classe|Class)\s+/i, "");
 }
 
 /** WCAG-style relative luminance for sRGB. */
@@ -156,7 +156,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Composition de la sécurité alimentaire par classe sociale. Chaque barre représente cent pour cent des répondants Pop2 pondérés de la classe. Comparer les proportions des segments colorés : bleu sécurité alimentaire, orange insécurité modérée, rouge insécurité sévère. Données descriptives pondérées, non causales."
+      "Food security composition by social class. Each bar is 100% of weighted Pop2 respondents in that class. Compare coloured segments: blue food security, orange moderate insecurity, red severe insecurity. Weighted descriptive data, not causal."
     );
 
   const innerW = width - margin.left - margin.right;
@@ -213,7 +213,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     })
     .each(function (d) {
       const label = valueLabels[d.key] ?? d.key;
-      const title = `${stratumLabels[d.stratum] ?? d.stratum}\n${label}: ${d.pct.toFixed(1)}% (pondéré Pop2)`;
+      const title = `${stratumLabels[d.stratum] ?? d.stratum}\n${label}: ${d.pct.toFixed(1)}% (weighted Pop2)`;
       d3.select(this).append("title").text(title);
     });
 
@@ -257,7 +257,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     .attr("fill", "currentColor")
     .attr("font-size", "12px")
     .attr("font-weight", "600")
-    .text("Part de chaque statut de sécurité alimentaire (%, pondéré)");
+    .text("Share of each food security status (%, weighted)");
   if (subtitle) {
     titleG
       .append("text")
@@ -278,7 +278,7 @@ export function chartStackedFoodInsecurity(container, dist, opts) {
     .attr("text-anchor", "middle")
     .attr("fill", "currentColor")
     .attr("font-size", "11px")
-    .text("Pourcentage de la strate");
+    .text("Percentage of stratum");
 
   const colorScale = d3
     .scaleOrdinal()
@@ -313,7 +313,7 @@ export function chartStackedMacroComposition(container, dist, opts) {
   const subtitle = opts.subtitle !== undefined ? opts.subtitle : null;
   const footnote = opts.footnote !== undefined ? opts.footnote : null;
   const title =
-    opts.title ?? "Structure de la consommation (parts relatives, 100 % par strate)";
+    opts.title ?? "Consumption structure (relative shares, 100% per stratum)";
   const stratumLabels = opts.stratumLabels ?? LABELS.RUC_4cl;
   const valueLabels = opts.valueLabels ?? {};
   const xTickFormat = opts.xTickFormat ?? ((d) => String(d));
@@ -353,7 +353,7 @@ export function chartStackedMacroComposition(container, dist, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Barres empilées à cent pour cent par classe sociale : cinq grandes familles alimentaires, hors eaux et boissons (conso_gpe29–34). Comparer les proportions entre classe pauvre et classe riche. Pop3 pondéré."
+      "One-hundred-percent stacked bars by social class: five main food families, excluding water and beverages (conso_gpe29–34). Compare shares between low- and high-income classes. Weighted Pop3."
     );
 
   const x = d3.scaleBand().domain(strata.map(String)).range([0, innerW]).padding(0.22);
@@ -407,7 +407,7 @@ export function chartStackedMacroComposition(container, dist, opts) {
     })
     .each(function (d) {
       const label = valueLabels[d.key] ?? d.key;
-      const titleText = `${stratumLabels[d.stratum] ?? d.stratum}\n${label}: ${d.pct.toFixed(1)} % de la conso. totale (pondéré Pop3)`;
+      const titleText = `${stratumLabels[d.stratum] ?? d.stratum}\n${label}: ${d.pct.toFixed(1)}% of total intake (weighted Pop3)`;
       d3.select(this).append("title").text(titleText);
     });
 
@@ -469,7 +469,7 @@ export function chartStackedMacroComposition(container, dist, opts) {
     .attr("text-anchor", "middle")
     .attr("fill", "currentColor")
     .attr("font-size", "11px")
-    .text("Part de la consommation (%)");
+    .text("Share of intake (%)");
 
   const colorScale = d3
     .scaleOrdinal()
@@ -506,18 +506,18 @@ export function chartBehaviorsGrouped(container, series, opts) {
   const metrics = [
     {
       key: "fastFoodFrequent",
-      line1: "Restauration rapide fréquente",
-      line2: "Échelon d’échelle ≥ 6"
+      line1: "Frequent fast food",
+      line2: "Scale step ≥ 6"
     },
     {
       key: "organicAny",
-      line1: "Consommation de bio (au moins une)",
+      line1: "Organic consumption (at least one)",
       line2: null
     },
     {
       key: "cantineFrequentChildren",
-      line1: "Cantine scolaire fréquente",
-      line2: "Enfants uniquement · échelon ≥ 6"
+      line1: "Frequent school canteen",
+      line2: "Children only · step ≥ 6"
     }
   ];
 
@@ -554,7 +554,7 @@ export function chartBehaviorsGrouped(container, series, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Part pondérée de trois comportements alimentaires par classe sociale (bleu plus foncé = classe plus aisée). Lignes : restauration rapide fréquente (échelle six ou plus), consommation de bio (au moins une), cantine scolaire fréquente pour les enfants uniquement. Chaque barre inclut seulement les répondants ayant une réponse valide pour l’item. Échelle en pourcentage sur l’axe horizontal."
+      "Weighted share of three dietary behaviours by social class (darker blue = higher-income class). Rows: frequent fast food (scale six or more), organic consumption (at least one), frequent school canteen for children only. Each bar includes only respondents with a valid answer for that item. Horizontal axis in percent."
     );
 
   const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
@@ -617,14 +617,14 @@ export function chartBehaviorsGrouped(container, series, opts) {
         const v = d[m.key];
         const metricNote =
           m.key === "cantineFrequentChildren"
-            ? " Enfants uniquement : adultes exclus ; part parmi les enfants avec fréquence de cantine valide (échelle ≥ 6 = fréquent)."
+            ? " Children only: adults excluded; share among children with valid canteen frequency (scale ≥ 6 = frequent)."
             : m.key === "fastFoodFrequent"
-              ? " Parmi les répondants avec fréquence de restauration rapide valide ; fréquent = échelon d’échelle ≥ 6."
-              : " Parmi les répondants avec item bio valide ; au moins une consommation de bio.";
+              ? " Among respondents with valid fast-food frequency; frequent = scale step ≥ 6."
+              : " Among respondents with valid organic item; at least one organic consumption.";
         const t =
           v == null
-            ? `Aucune réponse valide pour cette ligne.${metricNote}`
-            : `${(v * 100).toFixed(1)}% pondéré (${LABELS.RUC_4cl[d.stratum] ?? `Classe ${d.stratum}`}, Pop2).${metricNote}`;
+            ? `No valid response for this row.${metricNote}`
+            : `${(v * 100).toFixed(1)}% weighted (${LABELS.RUC_4cl[d.stratum] ?? `Class ${d.stratum}`}, Pop2).${metricNote}`;
         d3.select(this).append("title").text(t);
       });
 
@@ -693,7 +693,7 @@ export function chartBehaviorsGrouped(container, series, opts) {
 
   const leg = Swatches(rucColor, {
     columns: width >= 480 ? 4 : 2,
-    format: (s) => LABELS.RUC_4cl[Number(s)] ?? `Classe ${s}`,
+    format: (s) => LABELS.RUC_4cl[Number(s)] ?? `Class ${s}`,
     swatchWidth: 12,
     swatchHeight: 12
   });
@@ -712,8 +712,8 @@ export function chartBehaviorsGrouped(container, series, opts) {
  */
 export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = {}) {
   const width = opts.width ?? 720;
-  const rowLabel = opts.rowLabel ?? ((s) => LABELS.RUC_4cl[Number(s)] ?? `Classe ${s}`);
-  const chartTitle = opts.title ?? "Apport moyen par strate";
+  const rowLabel = opts.rowLabel ?? ((s) => LABELS.RUC_4cl[Number(s)] ?? `Class ${s}`);
+  const chartTitle = opts.title ?? "Mean intake by stratum";
   const chartFootnote = opts.footnote !== undefined ? opts.footnote : null;
 
   const rowLabels = rows.map((r) => rowLabel(r.stratum));
@@ -760,7 +760,7 @@ export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = 
     .attr("role", "img")
     .attr(
       "aria-label",
-      `${chartTitle}. Les lignes correspondent aux strates de revenu ; les colonnes aux groupes alimentaires et nutriments. Les valeurs des cellules sont les grammes par jour moyens de la strate ; la deuxième ligne montre l’écart en pourcentage à la moyenne nationale Pop3 pondérée. Survoler les cellules pour les valeurs exactes. Données descriptives, non causales.`
+      `${chartTitle}. Rows are income strata; columns are food groups and nutrients. Cell values are mean g/d for the stratum; the second line shows percent gap vs weighted national Pop3 mean. Hover cells for exact values. Descriptive data, not causal.`
     );
 
   svg
@@ -852,9 +852,9 @@ export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = 
     .each(function (d) {
       const lines = [
         `${rowLabel(d.stratum)} · ${d.fullLabel}`,
-        d.v == null ? "n/d" : `Moyenne de strate : ${d.v.toFixed(1)} g/j`,
-        d.nat == null ? "" : `Moyenne nationale Pop3 : ${d.nat.toFixed(1)} g/j`,
-        d.rel == null ? "" : `Écart à la moyenne nationale : ${d.rel >= 0 ? "+" : ""}${(d.rel * 100).toFixed(1)}%`
+        d.v == null ? "n/a" : `Stratum mean: ${d.v.toFixed(1)} g/d`,
+        d.nat == null ? "" : `National Pop3 mean: ${d.nat.toFixed(1)} g/d`,
+        d.rel == null ? "" : `Gap vs national mean: ${d.rel >= 0 ? "+" : ""}${(d.rel * 100).toFixed(1)}%`
       ];
       d3.select(this).append("title").text(lines.filter(Boolean).join("\n"));
     });
@@ -938,7 +938,7 @@ export function chartIntakeHeatmap(container, rows, keys, nationalMeans, opts = 
     .attr("font-size", "10px")
     .attr("fill", "currentColor")
     .attr("opacity", 0.9)
-    .text(`Sous la moyenne nationale ← 0% → Au-dessus de la moyenne (échelle ±${(maxAbs * 100).toFixed(0)}%)`);
+    .text(`Below national mean ← 0% → Above national mean (scale ±${(maxAbs * 100).toFixed(0)}%)`);
 
   container.append(wrap);
 }
@@ -995,7 +995,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Courbe : indice alimentaire moyen en fonction de la strate de revenu du ménage, quatre points reliés. Axe horizontal : strates une à quatre. Données descriptives Pop3 pondérées."
+      "Line chart: mean dietary index vs household income stratum, four linked points. Horizontal axis: strata one to four. Weighted descriptive Pop3 data."
     );
 
   const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
@@ -1036,7 +1036,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
       .attr("font-size", "9px")
       .attr("fill", "currentColor")
       .attr("opacity", 0.65)
-      .text("Moyenne nat. = 0 pp");
+      .text("National mean = 0 pp");
   }
 
   if (points.length >= 2) {
@@ -1086,11 +1086,11 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
       onSelectStratum(d.stratum);
     })
     .each(function (d) {
-      const lab = stratumLabels[d.stratum] ?? `Strate ${d.stratum}`;
+      const lab = stratumLabels[d.stratum] ?? `Stratum ${d.stratum}`;
       d3.select(this)
         .append("title")
         .text(
-          `${lab}\nEcart vs moyenne: ${d.yDelta >= 0 ? "+" : ""}${d.yDelta.toFixed(1)} pp\nIndice: ${d.yScore.toFixed(1)} / 100`
+          `${lab}\nGap vs mean: ${d.yDelta >= 0 ? "+" : ""}${d.yDelta.toFixed(1)} pp\nIndex: ${d.yScore.toFixed(1)} / 100`
         );
     });
 
@@ -1142,7 +1142,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .attr("text-anchor", "middle")
     .attr("fill", "currentColor")
     .attr("font-size", "11px")
-    .text("Ecart a la moyenne (points de pourcentage)");
+    .text("Gap vs mean (percentage points)");
 
   const titleG = g.append("g").attr("class", "inca-chart-title");
   titleG
@@ -1153,7 +1153,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
     .attr("fill", "currentColor")
     .attr("font-size", "13px")
     .attr("font-weight", "600")
-    .text("Indice « sante » : ecart a la moyenne par classe sociale");
+    .text("“Health” index: gap vs mean by social class");
   if (subtitle) {
     titleG
       .append("text")
@@ -1169,7 +1169,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
 
   const leg = Swatches(rucPt, {
     columns: width >= 480 ? 4 : 2,
-    format: (s) => stratumLabels[Number(s)] ?? `Classe ${s}`,
+    format: (s) => stratumLabels[Number(s)] ?? `Class ${s}`,
     swatchWidth: 12,
     swatchHeight: 12
   });
@@ -1194,7 +1194,7 @@ export function chartHealthScoreIncomeLine(container, series, opts) {
  */
 export function chartHealthScoreContributionProfile(container, components, opts = {}) {
   const width = opts.width ?? 640;
-  const title = opts.title ?? "Décomposition de l'indice (contributions moyennes)";
+  const title = opts.title ?? "Index breakdown (mean contributions)";
   const subtitle = opts.subtitle !== undefined ? opts.subtitle : null;
 
   const valueOf = (d) =>
@@ -1229,7 +1229,7 @@ export function chartHealthScoreContributionProfile(container, components, opts 
     .attr("width", width)
     .attr("height", height)
     .attr("role", "img")
-    .attr("aria-label", "Contributions moyennes par composante de l'indice santé, pour la strate sélectionnée.");
+    .attr("aria-label", "Mean contributions by component of the health index for the selected stratum.");
 
   const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
   const x = d3.scaleLinear().domain([-maxAbs * 1.1, maxAbs * 1.1]).range([0, innerW]);
@@ -1265,7 +1265,7 @@ export function chartHealthScoreContributionProfile(container, components, opts 
     .each(function (d) {
       d3.select(this)
         .append("title")
-        .text(`${d.label}\nContribution moyenne: ${valueOf(d).toFixed(2)} point(s) d'indice`);
+        .text(`${d.label}\nMean contribution: ${valueOf(d).toFixed(2)} index point(s)`);
     });
 
   g.selectAll("text.yLab")
@@ -1308,7 +1308,7 @@ export function chartHealthScoreContributionProfile(container, components, opts 
     .attr("font-weight", "500")
     .attr("fill", "currentColor")
     .attr("opacity", 0.88)
-    .text("Contribution moyenne (points d'indice)");
+    .text("Mean contribution (index points)");
 
   svg
     .append("text")
@@ -1348,11 +1348,11 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
   const stratumA = Number.isFinite(opts.stratumA) ? Number(opts.stratumA) : 1;
   const stratumB = Number.isFinite(opts.stratumB) ? Number(opts.stratumB) : 4;
   const stratumLabels = opts.stratumLabels ?? LABELS.RUC_4cl;
-  const title = opts.title ?? "Leviers de l'ecart nutritionnel";
+  const title = opts.title ?? "Drivers of the nutritional gap";
   const subtitle =
     opts.subtitle !== undefined
       ? opts.subtitle
-      : `${stratumLabels[stratumA] ?? `Classe ${stratumA}`} vs ${stratumLabels[stratumB] ?? `Classe ${stratumB}`}`;
+      : `${stratumLabels[stratumA] ?? `Class ${stratumA}`} vs ${stratumLabels[stratumB] ?? `Class ${stratumB}`}`;
   const maxItems = Number.isFinite(opts.maxItems) ? Number(opts.maxItems) : 9;
 
   const valueOf = (d) =>
@@ -1400,7 +1400,7 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
     .attr("width", width)
     .attr("height", height)
     .attr("role", "img")
-    .attr("aria-label", "Comparaison des contributions par composante entre classe pauvre et classe riche.");
+    .attr("aria-label", "Comparison of contributions by component between low- and high-income classes.");
 
   const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
   const x = d3.scaleLinear().domain([-maxAbs, maxAbs]).range([0, innerW]);
@@ -1445,7 +1445,7 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
     .each(function (d) {
       d3.select(this)
         .append("title")
-        .text(`${stratumLabels[stratumA] ?? `Classe ${stratumA}`}\n${d.label}: ${d.a.toFixed(2)} pp`);
+        .text(`${stratumLabels[stratumA] ?? `Class ${stratumA}`}\n${d.label}: ${d.a.toFixed(2)} pp`);
     });
 
   g.selectAll("circle.pb")
@@ -1459,7 +1459,7 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
     .each(function (d) {
       d3.select(this)
         .append("title")
-        .text(`${stratumLabels[stratumB] ?? `Classe ${stratumB}`}\n${d.label}: ${d.b.toFixed(2)} pp`);
+        .text(`${stratumLabels[stratumB] ?? `Class ${stratumB}`}\n${d.label}: ${d.b.toFixed(2)} pp`);
     });
 
   g.selectAll("text.yl")
@@ -1485,7 +1485,7 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
     .attr("font-size", "10px")
     .attr("font-weight", "600")
     .attr("fill", "currentColor")
-    .text((d) => `D ${d.delta >= 0 ? "+" : ""}${d.delta.toFixed(2)} pp`);
+    .text((d) => `Δ ${d.delta >= 0 ? "+" : ""}${d.delta.toFixed(2)} pp`);
 
   const xAxis = g.append("g").attr("transform", `translate(0,${innerH})`).call(
     d3.axisBottom(x).ticks(5).tickFormat((t) => `${Number(t) >= 0 ? "+" : ""}${Number(t).toFixed(2)}`)
@@ -1525,7 +1525,7 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
     .attr("font-weight", "500")
     .attr("fill", "currentColor")
     .attr("opacity", 0.9)
-    .text("Contributions en points de pourcentage (echelle auto-zoomee)");
+    .text("Contributions in percentage points (auto-zoomed scale)");
 
   const lg = svg.append("g").attr("transform", `translate(${margin.left},${height - 6})`);
   lg.append("circle").attr("cx", -2).attr("cy", -22).attr("r", 4).attr("fill", colorPoor);
@@ -1536,7 +1536,7 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
     .attr("dominant-baseline", "middle")
     .attr("font-size", "10px")
     .attr("fill", "currentColor")
-    .text(stratumLabels[stratumA] ?? `Classe ${stratumA}`);
+    .text(stratumLabels[stratumA] ?? `Class ${stratumA}`);
   lg.append("circle").attr("cx", 180).attr("cy", -22).attr("r", 4).attr("fill", colorRich);
   lg
     .append("text")
@@ -1545,7 +1545,7 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
     .attr("dominant-baseline", "middle")
     .attr("font-size", "10px")
     .attr("fill", "currentColor")
-    .text(stratumLabels[stratumB] ?? `Classe ${stratumB}`);
+    .text(stratumLabels[stratumB] ?? `Class ${stratumB}`);
 
   container.append(wrap);
 }
@@ -1561,15 +1561,15 @@ export function chartHealthContributionDumbbell(container, byStratum, opts = {})
 export function chartInequalityIndicatorHeatmap(container, rows, indicators, opts = {}) {
   const width = opts.width ?? 640;
   const stratumLabels = opts.stratumLabels ?? LABELS.RUC_4cl;
-  const title = opts.title ?? "Carte des inegalites nutritionnelles";
+  const title = opts.title ?? "Map of nutritional inequalities";
   const subtitle =
     opts.subtitle !== undefined
       ? opts.subtitle
-      : "Couleur: ecart standardise au sein de chaque indicateur";
+      : "Colour: standardised gap within each indicator";
   const legendLabel =
-    opts.legendLabel ?? "Moins favorable  -  0  -  Plus favorable";
+    opts.legendLabel ?? "Less favourable  —  0  —  More favourable";
 
-  const rowLabel = (s) => stratumLabels[Number(s)] ?? `Classe ${s}`;
+  const rowLabel = (s) => stratumLabels[Number(s)] ?? `Class ${s}`;
   const rowLabels = rows.map((r) => rowLabel(r.stratum));
   const leftW = Math.min(190, Math.max(100, 16 + (d3.max(rowLabels, (s) => s.length) ?? 12) * 7));
 
@@ -1622,7 +1622,7 @@ export function chartInequalityIndicatorHeatmap(container, rows, indicators, opt
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Heatmap des inegalites nutritionnelles par classe sociale et indicateur. Les couleurs montrent un ecart standardise au sein de chaque indicateur."
+      "Heatmap of nutritional inequalities by social class and indicator. Colours show a standardised gap within each indicator."
     );
 
   svg
@@ -1693,10 +1693,10 @@ export function chartInequalityIndicatorHeatmap(container, rows, indicators, opt
     .each(function (d) {
       const display = Number.isFinite(d.raw)
         ? (d.indicator.format ? d.indicator.format(d.raw) : `${d.raw.toFixed(1)}`)
-        : "n/d";
+        : "n/a";
       d3.select(this)
         .append("title")
-        .text(`${rowLabel(d.stratum)} · ${d.indicator.label}\nEcart: ${display}${d.z == null ? "" : `\nZ-score: ${d.z.toFixed(2)}`}`);
+        .text(`${rowLabel(d.stratum)} · ${d.indicator.label}\nGap: ${display}${d.z == null ? "" : `\nZ-score: ${d.z.toFixed(2)}`}`);
     });
 
   g.selectAll("g.hmt")
@@ -1782,11 +1782,11 @@ export function chartInequalityIndicatorHeatmap(container, rows, indicators, opt
 export function chartInequalityVerticalLadder(container, rows, indicators, opts = {}) {
   const width = opts.width ?? 640;
   const stratumLabels = opts.stratumLabels ?? LABELS.RUC_4cl;
-  const title = opts.title ?? "Profils socio-economiques des indicateurs alimentaires";
+  const title = opts.title ?? "Socio-economic profiles of dietary indicators";
   const subtitle =
     opts.subtitle !== undefined
       ? opts.subtitle
-      : "Comparaison des classes sociales sur des indicateurs harmonises";
+      : "Comparison of social classes on harmonised indicators";
 
   const classOrder = [1, 2, 3, 4];
   const classColors = {
@@ -1833,7 +1833,7 @@ export function chartInequalityVerticalLadder(container, rows, indicators, opts 
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Comparaison des profils socio-economiques sur des indicateurs alimentaires et de vulnerabilite."
+      "Comparison of socio-economic profiles on dietary and vulnerability indicators."
     );
 
   svg
@@ -1975,7 +1975,7 @@ export function chartInequalityVerticalLadder(container, rows, indicators, opts 
         const txt = b.ind.format ? b.ind.format(d.value) : `${d.value.toFixed(1)}`;
         d3.select(this)
           .append("title")
-          .text(`${stratumLabels[d.stratum] ?? `Classe ${d.stratum}`}\n${b.ind.label}: ${txt}`);
+          .text(`${stratumLabels[d.stratum] ?? `Class ${d.stratum}`}\n${b.ind.label}: ${txt}`);
       });
 
     g.selectAll("text.classLab")
@@ -2020,7 +2020,7 @@ export function chartInequalityVerticalLadder(container, rows, indicators, opts 
       .attr("dominant-baseline", "middle")
       .attr("font-size", "10px")
       .attr("fill", "currentColor")
-      .text(stratumLabels[s] ?? `Classe ${s}`);
+      .text(stratumLabels[s] ?? `Class ${s}`);
   });
 
   container.append(wrap);
@@ -2081,7 +2081,7 @@ export function chartHealthScoreComponents(container, components, opts) {
     .attr("role", "img")
     .attr(
       "aria-label",
-      "Composition de l’indice : apports favorables, apports à limiter, puis facteurs hors alimentation (tabac, IMC adultes, sécurité alimentaire, accès aux soins, situation financière). Barres proportionnelles aux poids."
+      "Index composition: favourable intakes, intakes to limit, then non-diet factors (tobacco, adult BMI, food security, healthcare access, financial situation). Bar length proportional to weights."
     );
 
   svg
@@ -2092,7 +2092,7 @@ export function chartHealthScoreComponents(container, components, opts) {
     .attr("font-size", "13px")
     .attr("font-weight", "600")
     .attr("fill", "currentColor")
-    .text("Variables et poids dans l’indice (alimentation + contexte, Pop3)");
+    .text("Variables and weights in the index (diet + context, Pop3)");
 
   const formLines = formulaLine
     ? splitFootnoteLines(formulaLine, Math.max(40, Math.floor((width - 32) / 5.2)))
@@ -2159,14 +2159,14 @@ export function chartHealthScoreComponents(container, components, opts) {
   }
 
   const yStart = margin.top;
-  drawBlock(yStart, "À encourager (s_k = +1)", colorProt, prot, colorProt);
+  drawBlock(yStart, "To encourage (s_k = +1)", colorProt, prot, colorProt);
   const yRisk = yStart + headerProt + prot.length * rowH + blockGap;
-  drawBlock(yRisk, "À modérer (s_k = −1)", colorRisk, risk, colorRisk);
+  drawBlock(yRisk, "To limit (s_k = −1)", colorRisk, risk, colorRisk);
   if (ctx.length) {
     const yCtx = yRisk + headerRisk + risk.length * rowH + blockGap;
     drawBlock(
       yCtx,
-      "Contexte santé / social (s_k = +1, score dérivé ↑ = plus favorable)",
+      "Health / social context (s_k = +1, higher derived score = more favourable)",
       colorCtx,
       ctx,
       colorCtx

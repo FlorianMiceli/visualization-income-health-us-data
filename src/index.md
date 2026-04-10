@@ -1,21 +1,21 @@
 ---
-title: Accueil
+title: Home
 toc: false
 pager: false
 ---
 
 <div class="inca-landing">
 
-# Accueil
+# Home
 
-<p class="inca-landing-lead">Exploration descriptive des données INCA3 : inégalités sociales, alimentation et apports, avec pondération officielle. Le menu (⋯) en haut à droite ouvre les autres pages du site.</p>
+<p class="inca-landing-lead">Descriptive exploration of INCA3 data: social inequality, diet and intakes, with official survey weights. The menu (⋯) at the top right opens the other site pages.</p>
 
 <div class="inca-landing-actions">
-  <a class="inca-landing-actions__primary" href="./inca-inequality">Tableau INCA3</a>
-  <a href="./inca-viz-rationale">Choix de visualisation</a>
-  <a href="./data/inca/DATA_DICTIONARY">Dictionnaire des données</a>
+  <a class="inca-landing-actions__primary" href="./inca-inequality">INCA3 dashboard</a>
+  <a href="./inca-viz-rationale">Visualisation choices</a>
+  <a href="./data/inca/DATA_DICTIONARY">Data dictionary</a>
 </div>
 
-<p class="inca-landing-lead" style="margin-top: 2rem; font-size: 0.95rem">Les graphiques nécessitent <code>npm run dev</code> ou un serveur HTTP sur le dossier <code>dist/</code> après <code>npm run build</code> ; un simple aperçu Markdown ne suffit pas.</p>
+<p class="inca-landing-lead" style="margin-top: 2rem; font-size: 0.95rem">Charts require <code>npm run dev</code> or an HTTP server on the <code>dist/</code> folder after <code>npm run build</code>; a plain Markdown preview is not enough.</p>
 
 </div>

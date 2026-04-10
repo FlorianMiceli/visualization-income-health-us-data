@@ -1,5 +1,5 @@
 ---
-title: INCA3 — Inégalités sociales et alimentation
+title: INCA3 — Social inequality and diet
 toc: false
 pager: false
 ---
@@ -127,10 +127,10 @@ const chartHealthCombined = resize((width) => {
   let selectedStratum = 4;
   const available = [1, 2, 3, 4];
   const classNames = {
-    1: "Classe pauvre",
-    2: "Classe moyenne modeste",
-    3: "Classe moyenne aisée",
-    4: "Classe riche"
+    1: "Low-income class",
+    2: "Lower-middle class",
+    3: "Upper-middle class",
+    4: "High-income class"
   };
   const classColors = {
     1: "#d73027",
@@ -142,14 +142,14 @@ const chartHealthCombined = resize((width) => {
   function renderControls() {
     controls.replaceChildren();
     const label = document.createElement("span");
-    label.textContent = "Classe affichée :";
+    label.textContent = "Class shown:";
     label.style.cssText = "font-size:0.92rem;opacity:0.85;margin-right:0.25rem;";
     controls.appendChild(label);
 
     for (const s of available) {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.textContent = classNames[s] ?? `Classe ${s}`;
+      btn.textContent = classNames[s] ?? `Class ${s}`;
       const active = s === selectedStratum;
       const color = classColors[s] ?? "#1f6feb";
       btn.style.cssText = `
@@ -192,8 +192,8 @@ const chartHealthCombined = resize((width) => {
     }));
     chartHealthScoreContributionProfile(compWrap, selectedComponents, {
       width: rightWidth,
-      title: "Composition de l'indice (contributions moyennes)",
-      subtitle: `Classe sélectionnée : ${classNames[selectedStratum] ?? `Classe ${selectedStratum}`}`
+      title: "Index composition (mean contributions)",
+      subtitle: `Selected class: ${classNames[selectedStratum] ?? `Class ${selectedStratum}`}`
     });
   }
 
@@ -217,10 +217,10 @@ const chartMacroComposition = resize((width) => {
     width,
     stratumLabels: LABELS.RUC_4cl,
     valueLabels: gpeMacroLabels,
-    title: "Parts relatives du panier alimentaire par classe sociale",
+    title: "Relative shares of the food basket by social class",
     subtitle: null,
     xTickFormat: (d) =>
-      ({ "1": "Pauvre", "2": "Moy. modeste", "3": "Moy. aisée", "4": "Riche" }[String(d)] ?? String(d)),
+      ({ "1": "Low", "2": "L. middle", "3": "U. middle", "4": "High" }[String(d)] ?? String(d)),
     footnote: null
   });
   return el;
@@ -230,7 +230,7 @@ const chartIntakeHeat = resize((width) => {
   const el = document.createElement("div");
   chartIntakeHeatmap(el, intakeByRuc, heatKeys, nationalMeans, {
     width,
-    title: "Apports moyens par classe de revenu par rapport à la moyenne nationale",
+    title: "Mean intakes by income class relative to the national mean",
     footnote: null
   });
   return el;
@@ -240,17 +240,17 @@ const chartIntakeHeat = resize((width) => {
 
 <div class="inca-dashboard">
 
-# INCA3 — Inégalités sociales et alimentation
+# INCA3 — Social inequality and diet
 
-<p class="inca-dash-lead">Tableau de bord descriptif (pondération INCA3) : indice « santé » et composition, insécurité alimentaire, structure des apports et écarts aux moyennes nationales. Aucune interprétation causale.</p>
+<p class="inca-dash-lead">Descriptive dashboard (INCA3 weights): “health” index and composition, food insecurity, intake structure, and gaps vs national means. No causal interpretation.</p>
 
-<section class="inca-hero" aria-label="Indice santé et composition">
+<section class="inca-hero" aria-label="Health index and composition">
 
 <div class="inca-hero__panel">
 
-<h2>Indice alimentaire « santé » et composition</h2>
+<h2>Dietary “health” index and composition</h2>
 
-<p>Sélectionner une classe sociale pour relier la position sur la courbe et la composition de l’indice.</p>
+<p>Select a social class to link the position on the curve with the index composition.</p>
 
 ${chartHealthCombined}
 
@@ -258,13 +258,13 @@ ${chartHealthCombined}
 
 </section>
 
-<section class="inca-rest" aria-label="Autres graphiques">
+<section class="inca-rest" aria-label="Other charts">
 
-<h2>Autres visualisations</h2>
+<h2>Other visualisations</h2>
 
 <div class="inca-card">
 
-<h3>Insécurité alimentaire par classe de revenu</h3>
+<h3>Food insecurity by income class</h3>
 
 ${chartFoodInsecurity}
 
@@ -272,7 +272,7 @@ ${chartFoodInsecurity}
 
 <div class="inca-card" style="margin-top:1rem;">
 
-<h3>Structure de la consommation par quartile</h3>
+<h3>Consumption structure by quartile</h3>
 
 ${chartMacroComposition}
 
@@ -280,7 +280,7 @@ ${chartMacroComposition}
 
 <div class="inca-card inca-card--wide">
 
-<h3>Groupes alimentaires et nutriments par rapport à la moyenne nationale</h3>
+<h3>Food groups and nutrients vs national mean</h3>
 
 ${chartIntakeHeat}
 

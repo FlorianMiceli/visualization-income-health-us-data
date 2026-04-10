@@ -1,6 +1,6 @@
 // See https://observablehq.com/framework/config for documentation.
 export default {
-  title: "Visualisation des données",
+  title: "Data visualisation",
   root: "src",
 
   style: "app-shell.css",
@@ -20,18 +20,18 @@ export default {
 
     return `<a class="inca-header-brand" href="./">INCA · visualisations</a>
 <details class="inca-site-nav">
-  <summary aria-label="Autres pages"></summary>
-  <nav class="inca-site-nav__panel" aria-label="Navigation du site">
-    <a href="./"${home ? " aria-current=\"page\"" : ""}>Accueil</a>
-    <a href="./inca-inequality"${dash ? " aria-current=\"page\"" : ""}>Tableau INCA3</a>
-    <a href="./inca-viz-rationale"${rationale ? " aria-current=\"page\"" : ""}>Choix de visualisation</a>
-    <a href="./data/inca/DATA_DICTIONARY"${dict ? " aria-current=\"page\"" : ""}>Dictionnaire des données</a>
+  <summary aria-label="Other pages"></summary>
+  <nav class="inca-site-nav__panel" aria-label="Site navigation">
+    <a href="./"${home ? " aria-current=\"page\"" : ""}>Home</a>
+    <a href="./inca-inequality"${dash ? " aria-current=\"page\"" : ""}>INCA3 dashboard</a>
+    <a href="./inca-viz-rationale"${rationale ? " aria-current=\"page\"" : ""}>Visualisation choices</a>
+    <a href="./data/inca/DATA_DICTIONARY"${dict ? " aria-current=\"page\"" : ""}>Data dictionary</a>
   </nav>
 </details>`;
   },
 
   footer: () =>
-    `<div class="inca-footer-note">Données INCA3 — analyse descriptive</div>`,
+    `<div class="inca-footer-note">INCA3 data — descriptive analysis</div>`,
 
   pager: false
 };

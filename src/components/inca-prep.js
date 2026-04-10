@@ -299,7 +299,7 @@ export const NUTRIENT_KEYS = [
 export const GPE_MACRO_GROUPS = [
   {
     id: "plant_fruit_leg",
-    label: "Fruits, légumes, pommes de terre & noix",
+    label: "Fruit, vegetables, potatoes & nuts",
     keys: [
       "conso_gpe21",
       "conso_gpe22",
@@ -311,17 +311,17 @@ export const GPE_MACRO_GROUPS = [
   },
   {
     id: "cereals_sweet",
-    label: "Pain, céréales & produits sucrés",
+    label: "Bread, cereals & sweet products",
     keys: ["conso_gpe1", "conso_gpe2", "conso_gpe3", "conso_gpe4", "conso_gpe5", "conso_gpe6", "conso_gpe27", "conso_gpe28"]
   },
   {
     id: "dairy",
-    label: "Laits, yaourts, fromages, desserts lactés, glaces",
+    label: "Milk, yogurt, cheese, dairy desserts, ice cream",
     keys: ["conso_gpe7", "conso_gpe8", "conso_gpe9", "conso_gpe10", "conso_gpe11"]
   },
   {
     id: "animal_protein",
-    label: "Viandes, poissons & œufs",
+    label: "Meat, fish & eggs",
     keys: [
       "conso_gpe14",
       "conso_gpe15",
@@ -334,7 +334,7 @@ export const GPE_MACRO_GROUPS = [
   },
   {
     id: "prepared_other",
-    label: "Plats composés, lipides, condiments & autres",
+    label: "Composite dishes, fats, condiments & other",
     keys: [
       "conso_gpe12",
       "conso_gpe13",
@@ -414,19 +414,19 @@ export function weightedGpeMacroCompositionByStratum(rows, stratumKey, stratumOr
  * Les variables « contexte » sont issues du questionnaire individuel (pas des R24) ; tabac vérifié vs consommation déclarée.
  */
 export const HEALTH_SCORE_SPEC = [
-  { id: "conso_gpe21", group: "diet", source: "column", column: "conso_gpe21", weight: 0.1224, direction: 1, label: "Légumes (g/j)", role: "protective" },
-  { id: "conso_gpe24", group: "diet", source: "column", column: "conso_gpe24", weight: 0.108, direction: 1, label: "Fruits frais & secs (g/j)", role: "protective" },
-  { id: "nutriment8", group: "diet", source: "column", column: "nutriment8", weight: 0.1296, direction: 1, label: "Fibres (g/j)", role: "protective" },
-  { id: "conso_gpe17", group: "diet", source: "column", column: "conso_gpe17", weight: 0.0792, direction: -1, label: "Charcuterie (g/j)", role: "risk" },
-  { id: "conso_gpe40", group: "diet", source: "column", column: "conso_gpe40", weight: 0.0792, direction: -1, label: "Sandwichs, pizza, boul. salée (g/j)", role: "risk" },
-  { id: "conso_gpe31", group: "diet", source: "column", column: "conso_gpe31", weight: 0.0864, direction: -1, label: "Boissons sucrées BRSA (g/j)", role: "risk" },
-  { id: "conso_gpe6", group: "diet", source: "column", column: "conso_gpe6", weight: 0.0792, direction: -1, label: "Viennoiseries, biscuits, gâteaux (g/j)", role: "risk" },
-  { id: "nutriment31", group: "diet", source: "column", column: "nutriment31", weight: 0.036, direction: -1, label: "Sel (g/j)", role: "risk" },
-  { id: "ctx_tabac", group: "context", source: "derived", weight: 0.09, direction: 1, label: "Tabac (usage déclaré)", role: "context" },
-  { id: "ctx_imc", group: "context", source: "derived", weight: 0.09, direction: 1, label: "IMC adultes (−|IMC−22,5|)", role: "context" },
-  { id: "ctx_ia", group: "context", source: "derived", weight: 0.05, direction: 1, label: "Sécurité alimentaire (IA_statut)", role: "context" },
-  { id: "ctx_soins", group: "context", source: "derived", weight: 0.025, direction: 1, label: "Accès aux soins (non-renoncement)", role: "context" },
-  { id: "ctx_fin", group: "context", source: "derived", weight: 0.025, direction: 1, label: "Situation financière perçue", role: "context" }
+  { id: "conso_gpe21", group: "diet", source: "column", column: "conso_gpe21", weight: 0.1224, direction: 1, label: "Vegetables (g/d)", role: "protective" },
+  { id: "conso_gpe24", group: "diet", source: "column", column: "conso_gpe24", weight: 0.108, direction: 1, label: "Fresh & dried fruit (g/d)", role: "protective" },
+  { id: "nutriment8", group: "diet", source: "column", column: "nutriment8", weight: 0.1296, direction: 1, label: "Fibre (g/d)", role: "protective" },
+  { id: "conso_gpe17", group: "diet", source: "column", column: "conso_gpe17", weight: 0.0792, direction: -1, label: "Charcuterie (g/d)", role: "risk" },
+  { id: "conso_gpe40", group: "diet", source: "column", column: "conso_gpe40", weight: 0.0792, direction: -1, label: "Sandwiches, pizza, savoury bakery (g/d)", role: "risk" },
+  { id: "conso_gpe31", group: "diet", source: "column", column: "conso_gpe31", weight: 0.0864, direction: -1, label: "Sweet drinks BRSA (g/d)", role: "risk" },
+  { id: "conso_gpe6", group: "diet", source: "column", column: "conso_gpe6", weight: 0.0792, direction: -1, label: "Pastries, biscuits, cakes (g/d)", role: "risk" },
+  { id: "nutriment31", group: "diet", source: "column", column: "nutriment31", weight: 0.036, direction: -1, label: "Salt (g/d)", role: "risk" },
+  { id: "ctx_tabac", group: "context", source: "derived", weight: 0.09, direction: 1, label: "Tobacco (self-reported use)", role: "context" },
+  { id: "ctx_imc", group: "context", source: "derived", weight: 0.09, direction: 1, label: "Adult BMI (−|BMI−22.5|)", role: "context" },
+  { id: "ctx_ia", group: "context", source: "derived", weight: 0.05, direction: 1, label: "Food security (IA_statut)", role: "context" },
+  { id: "ctx_soins", group: "context", source: "derived", weight: 0.025, direction: 1, label: "Healthcare access (no foregone care)", role: "context" },
+  { id: "ctx_fin", group: "context", source: "derived", weight: 0.025, direction: 1, label: "Perceived financial situation", role: "context" }
 ];
 
 /** Même pondérations que HEALTH_SCORE_SPEC, format attendu par le graphique « composition ». */
